@@ -94,7 +94,7 @@ export default function PolicyPage({ geojson, byDistrict, policySummary }) {
     sections, generating, progress, cooldown,
     sessionFull, sessionCount, SESSION_CAP,
     generate, findComparables,
-  } = usePolicyDossier(policySummary)
+  } = usePolicyDossier(policySummary, byDistrict)
 
   // Auto-generate when district is selected
   useEffect(() => {

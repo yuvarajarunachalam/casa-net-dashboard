@@ -43,7 +43,7 @@ async function callDossierAPI(section, districtData, cropPolicy, schemes, compar
   return data.text
 }
 
-export function usePolicyDossier(allDistrictData) {
+export function usePolicyDossier(allDistrictData, byDistrict) {
   const [sections,    setSections]    = useState({})
   const [generating,  setGenerating]  = useState(false)
   const [progress,    setProgress]    = useState(0)
@@ -53,7 +53,9 @@ export function usePolicyDossier(allDistrictData) {
 
   function findComparables(district, data) {
     if (!data?.length) return []
-    const d = data.find(r => r.District === district)
+    const d = (byDistrict && byDistrict[district])
+      ? byDistrict[district]
+      : data.find(r => r.District === district)
     if (!d) return []
 
     return data
@@ -91,7 +93,11 @@ export function usePolicyDossier(allDistrictData) {
       return
     }
 
-    const districtData = allDistrictData?.find(r => r.District === district)
+    // Use byDistrict for direct lookup — already correctly keyed from the data loader
+    // This avoids name mismatch between GeoJSON dtname and CSV District column
+    const districtData = (byDistrict && byDistrict[district])
+      ? byDistrict[district]
+      : allDistrictData?.find(r => r.District === district)
     if (!districtData) return
 
     activeDistrict.current = district
