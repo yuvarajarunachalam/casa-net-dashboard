@@ -17,12 +17,12 @@ Chennai,Groundwater-dependent,0.785,-0.417,3yr,Samba,3.87,Stable/recovering,Rice
 Chennai,Groundwater-dependent,0.785,-0.417,3yr,Kuruvai,3.87,Stable/recovering,Rice,Bajra,True,Bajra(0.203) > Jowar(0.238) > Groundnut(0.275) > Maize(0.298) > Rice(0.815),2500,400,84.0,1.0,Rice,2487.7
 Chennai,Groundwater-dependent,0.785,-0.417,5yr,Samba,3.87,Stable/recovering,Rice,Bajra,True,Bajra(0.169) > Jowar(0.205) > Groundnut(0.241) > Maize(0.265) > Rice(0.781),2500,400,84.0,1.0,Rice,2487.7
 Chennai,Groundwater-dependent,0.785,-0.417,5yr,Kuruvai,3.87,Stable/recovering,Rice,Bajra,True,Bajra(0.203) > Jowar(0.238) > Groundnut(0.275) > Maize(0.298) > Rice(0.815),2500,400,84.0,1.0,Rice,2487.7
-Coimbatore,Groundwater-dependent,0.872,-0.432,1yr,Samba,11.66,Stable/recovering,Jowar,Groundnut,False,Groundnut(0.305) > Bajra(0.309) > Jowar(0.462),700,1000,0.0,0.0,Jowar,852.8
-Coimbatore,Groundwater-dependent,0.872,-0.432,1yr,Kuruvai,11.66,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.259) > Bajra(0.263) > Maize(0.283) > Jowar(0.416) > Rice(0.439),700,1000,0.0,0.0,Jowar,852.8
-Coimbatore,Groundwater-dependent,0.872,-0.432,3yr,Samba,11.77,Stable/recovering,Jowar,Groundnut,False,Groundnut(0.305) > Bajra(0.309) > Jowar(0.462),700,1000,0.0,0.0,Jowar,852.8
-Coimbatore,Groundwater-dependent,0.872,-0.432,3yr,Kuruvai,11.77,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.259) > Bajra(0.263) > Maize(0.283) > Jowar(0.416) > Rice(0.439),700,1000,0.0,0.0,Jowar,852.8
-Coimbatore,Groundwater-dependent,0.872,-0.432,5yr,Samba,11.77,Stable/recovering,Jowar,Groundnut,False,Groundnut(0.305) > Bajra(0.309) > Jowar(0.462),700,1000,0.0,0.0,Jowar,852.8
-Coimbatore,Groundwater-dependent,0.872,-0.432,5yr,Kuruvai,11.77,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.259) > Bajra(0.263) > Maize(0.283) > Jowar(0.416) > Rice(0.439),700,1000,0.0,0.0,Jowar,852.8
+Coimbatore,Groundwater-dependent,0.872,-0.432,1yr,Samba,11.66,Stable/recovering,Jowar,Bajra,False,Groundnut(0.305) > Bajra(0.309) > Jowar(0.462),700,400,42.9,0.0,Jowar,852.8
+Coimbatore,Groundwater-dependent,0.872,-0.432,1yr,Kuruvai,11.66,Stable/recovering,Jowar,Bajra,True,Groundnut(0.259) > Bajra(0.263) > Maize(0.283) > Jowar(0.416) > Rice(0.439),700,400,42.9,0.0,Jowar,852.8
+Coimbatore,Groundwater-dependent,0.872,-0.432,3yr,Samba,11.77,Stable/recovering,Jowar,Bajra,False,Groundnut(0.305) > Bajra(0.309) > Jowar(0.462),700,400,42.9,0.0,Jowar,852.8
+Coimbatore,Groundwater-dependent,0.872,-0.432,3yr,Kuruvai,11.77,Stable/recovering,Jowar,Bajra,True,Groundnut(0.259) > Bajra(0.263) > Maize(0.283) > Jowar(0.416) > Rice(0.439),700,400,42.9,0.0,Jowar,852.8
+Coimbatore,Groundwater-dependent,0.872,-0.432,5yr,Samba,11.77,Stable/recovering,Jowar,Bajra,False,Groundnut(0.305) > Bajra(0.309) > Jowar(0.462),700,400,42.9,0.0,Jowar,852.8
+Coimbatore,Groundwater-dependent,0.872,-0.432,5yr,Kuruvai,11.77,Stable/recovering,Jowar,Bajra,True,Groundnut(0.259) > Bajra(0.263) > Maize(0.283) > Jowar(0.416) > Rice(0.439),700,400,42.9,0.0,Jowar,852.8
 Cuddalore,Groundwater-dependent,0.671,-0.235,1yr,Samba,5.18,Stable/recovering,Rice,Bajra,True,Bajra(0.133) > Groundnut(0.210) > Maize(0.280) > Jowar(0.326) > Rice(0.416),2500,400,84.0,0.0,Jowar,2168.4
 Cuddalore,Groundwater-dependent,0.671,-0.235,1yr,Kuruvai,5.18,Stable/recovering,Rice,Bajra,True,Bajra(0.165) > Groundnut(0.243) > Maize(0.313) > Jowar(0.359) > Rice(0.449),2500,400,84.0,0.0,Jowar,2168.4
 Cuddalore,Groundwater-dependent,0.671,-0.235,3yr,Samba,5.2,Stable/recovering,Rice,Bajra,True,Bajra(0.133) > Groundnut(0.210) > Maize(0.280) > Jowar(0.326) > Rice(0.416),2500,400,84.0,0.0,Jowar,2168.4
@@ -65,12 +65,12 @@ Kanniyakumari,Surface-water dominant,0.251,0.209,3yr,Samba,5.03,Slow depletion,R
 Kanniyakumari,Surface-water dominant,0.251,0.209,3yr,Kuruvai,5.03,Slow depletion,Rice,Bajra,True,Bajra(0.117) > Jowar(0.183) > Groundnut(0.189) > Maize(0.213) > Rice(0.609),2500,400,84.0,0.7328,Rice,2498.0
 Kanniyakumari,Surface-water dominant,0.251,0.209,5yr,Samba,5.11,Slow depletion,Rice,Bajra,True,Bajra(0.119) > Jowar(0.185) > Groundnut(0.191) > Maize(0.215) > Rice(0.611),2500,400,84.0,0.7328,Rice,2498.0
 Kanniyakumari,Surface-water dominant,0.251,0.209,5yr,Kuruvai,5.11,Slow depletion,Rice,Bajra,True,Bajra(0.117) > Jowar(0.183) > Groundnut(0.189) > Maize(0.213) > Rice(0.609),2500,400,84.0,0.7328,Rice,2498.0
-Karur,Groundwater-dependent,0.897,-0.135,1yr,Samba,5.01,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.249) > Bajra(0.264) > Jowar(0.275) > Rice(0.436) > Maize(0.517),700,1000,0.0,0.0776,Maize,1382.6
-Karur,Groundwater-dependent,0.897,-0.135,1yr,Kuruvai,5.01,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.259) > Bajra(0.273) > Jowar(0.285) > Rice(0.446) > Maize(0.526),700,1000,0.0,0.0776,Maize,1382.6
-Karur,Groundwater-dependent,0.897,-0.135,3yr,Samba,4.96,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.249) > Bajra(0.264) > Jowar(0.275) > Rice(0.436) > Maize(0.517),700,1000,0.0,0.0776,Maize,1382.6
-Karur,Groundwater-dependent,0.897,-0.135,3yr,Kuruvai,4.96,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.259) > Bajra(0.273) > Jowar(0.285) > Rice(0.446) > Maize(0.526),700,1000,0.0,0.0776,Maize,1382.6
-Karur,Groundwater-dependent,0.897,-0.135,5yr,Samba,4.88,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.249) > Bajra(0.264) > Jowar(0.275) > Rice(0.436) > Maize(0.517),700,1000,0.0,0.0776,Maize,1382.6
-Karur,Groundwater-dependent,0.897,-0.135,5yr,Kuruvai,4.88,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.259) > Bajra(0.273) > Jowar(0.285) > Rice(0.446) > Maize(0.526),700,1000,0.0,0.0776,Maize,1382.6
+Karur,Groundwater-dependent,0.897,-0.135,1yr,Samba,5.01,Stable/recovering,Jowar,Bajra,True,Groundnut(0.249) > Bajra(0.264) > Jowar(0.275) > Rice(0.436) > Maize(0.517),700,400,42.9,0.0776,Maize,1382.6
+Karur,Groundwater-dependent,0.897,-0.135,1yr,Kuruvai,5.01,Stable/recovering,Jowar,Bajra,True,Groundnut(0.259) > Bajra(0.273) > Jowar(0.285) > Rice(0.446) > Maize(0.526),700,400,42.9,0.0776,Maize,1382.6
+Karur,Groundwater-dependent,0.897,-0.135,3yr,Samba,4.96,Stable/recovering,Jowar,Bajra,True,Groundnut(0.249) > Bajra(0.264) > Jowar(0.275) > Rice(0.436) > Maize(0.517),700,400,42.9,0.0776,Maize,1382.6
+Karur,Groundwater-dependent,0.897,-0.135,3yr,Kuruvai,4.96,Stable/recovering,Jowar,Bajra,True,Groundnut(0.259) > Bajra(0.273) > Jowar(0.285) > Rice(0.446) > Maize(0.526),700,400,42.9,0.0776,Maize,1382.6
+Karur,Groundwater-dependent,0.897,-0.135,5yr,Samba,4.88,Stable/recovering,Jowar,Bajra,True,Groundnut(0.249) > Bajra(0.264) > Jowar(0.275) > Rice(0.436) > Maize(0.517),700,400,42.9,0.0776,Maize,1382.6
+Karur,Groundwater-dependent,0.897,-0.135,5yr,Kuruvai,4.88,Stable/recovering,Jowar,Bajra,True,Groundnut(0.259) > Bajra(0.273) > Jowar(0.285) > Rice(0.446) > Maize(0.526),700,400,42.9,0.0776,Maize,1382.6
 Krishnagiri,Groundwater-dependent,0.884,-1.096,1yr,Samba,7.5,Stable/recovering,Rice,Jowar,True,Jowar(0.260) > Bajra(0.281) > Maize(0.284) > Groundnut(0.313) > Rice(0.612),2500,700,72.0,0.4651,Rice,1884.8
 Krishnagiri,Groundwater-dependent,0.884,-1.096,1yr,Kuruvai,7.5,Stable/recovering,Rice,Jowar,True,Jowar(0.247) > Bajra(0.269) > Maize(0.272) > Groundnut(0.300) > Rice(0.600),2500,700,72.0,0.4651,Rice,1884.8
 Krishnagiri,Groundwater-dependent,0.884,-1.096,3yr,Samba,7.72,Stable/recovering,Rice,Jowar,True,Jowar(0.260) > Bajra(0.281) > Maize(0.284) > Groundnut(0.313) > Rice(0.612),2500,700,72.0,0.4651,Rice,1884.8
@@ -95,12 +95,12 @@ Nagapattinam,Surface-water dominant,0.0,-0.14,3yr,Samba,2.86,Stable/recovering,R
 Nagapattinam,Surface-water dominant,0.0,-0.14,3yr,Kuruvai,2.86,Stable/recovering,Rice,Bajra,True,Bajra(0.109) > Jowar(0.145) > Groundnut(0.181) > Rice(0.394) > Maize(0.441),2500,400,84.0,0.2749,Maize,2473.9
 Nagapattinam,Surface-water dominant,0.0,-0.14,5yr,Samba,2.87,Stable/recovering,Rice,Bajra,True,Bajra(0.038) > Jowar(0.074) > Groundnut(0.110) > Rice(0.324) > Maize(0.370),2500,400,84.0,0.2749,Maize,2473.9
 Nagapattinam,Surface-water dominant,0.0,-0.14,5yr,Kuruvai,2.87,Stable/recovering,Rice,Bajra,True,Bajra(0.109) > Jowar(0.145) > Groundnut(0.181) > Rice(0.394) > Maize(0.441),2500,400,84.0,0.2749,Maize,2473.9
-Namakkal,Groundwater-dependent,0.905,-0.792,1yr,Samba,9.54,Stable/recovering,Jowar,Groundnut,False,Groundnut(0.317) > Maize(0.341) > Bajra(0.393) > Jowar(0.403),700,1000,0.0,0.0,Bajra,972.9
-Namakkal,Groundwater-dependent,0.905,-0.792,1yr,Kuruvai,9.54,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.306) > Maize(0.330) > Bajra(0.382) > Jowar(0.393) > Rice(0.486),700,1000,0.0,0.0,Bajra,972.9
-Namakkal,Groundwater-dependent,0.905,-0.792,3yr,Samba,9.57,Stable/recovering,Jowar,Groundnut,False,Groundnut(0.317) > Maize(0.341) > Bajra(0.393) > Jowar(0.403),700,1000,0.0,0.0,Bajra,972.9
-Namakkal,Groundwater-dependent,0.905,-0.792,3yr,Kuruvai,9.57,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.306) > Maize(0.330) > Bajra(0.382) > Jowar(0.393) > Rice(0.486),700,1000,0.0,0.0,Bajra,972.9
-Namakkal,Groundwater-dependent,0.905,-0.792,5yr,Samba,9.51,Stable/recovering,Jowar,Groundnut,False,Groundnut(0.317) > Maize(0.341) > Bajra(0.393) > Jowar(0.403),700,1000,0.0,0.0,Bajra,972.9
-Namakkal,Groundwater-dependent,0.905,-0.792,5yr,Kuruvai,9.51,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.306) > Maize(0.330) > Bajra(0.382) > Jowar(0.393) > Rice(0.486),700,1000,0.0,0.0,Bajra,972.9
+Namakkal,Groundwater-dependent,0.905,-0.792,1yr,Samba,9.54,Stable/recovering,Jowar,Bajra,False,Groundnut(0.317) > Maize(0.341) > Bajra(0.393) > Jowar(0.403),700,400,42.9,0.0,Bajra,972.9
+Namakkal,Groundwater-dependent,0.905,-0.792,1yr,Kuruvai,9.54,Stable/recovering,Jowar,Bajra,True,Groundnut(0.306) > Maize(0.330) > Bajra(0.382) > Jowar(0.393) > Rice(0.486),700,400,42.9,0.0,Bajra,972.9
+Namakkal,Groundwater-dependent,0.905,-0.792,3yr,Samba,9.57,Stable/recovering,Jowar,Bajra,False,Groundnut(0.317) > Maize(0.341) > Bajra(0.393) > Jowar(0.403),700,400,42.9,0.0,Bajra,972.9
+Namakkal,Groundwater-dependent,0.905,-0.792,3yr,Kuruvai,9.57,Stable/recovering,Jowar,Bajra,True,Groundnut(0.306) > Maize(0.330) > Bajra(0.382) > Jowar(0.393) > Rice(0.486),700,400,42.9,0.0,Bajra,972.9
+Namakkal,Groundwater-dependent,0.905,-0.792,5yr,Samba,9.51,Stable/recovering,Jowar,Bajra,False,Groundnut(0.317) > Maize(0.341) > Bajra(0.393) > Jowar(0.403),700,400,42.9,0.0,Bajra,972.9
+Namakkal,Groundwater-dependent,0.905,-0.792,5yr,Kuruvai,9.51,Stable/recovering,Jowar,Bajra,True,Groundnut(0.306) > Maize(0.330) > Bajra(0.382) > Jowar(0.393) > Rice(0.486),700,400,42.9,0.0,Bajra,972.9
 Perambalur,Groundwater-dependent,1.0,0.103,1yr,Samba,6.06,Slow depletion,Maize,Bajra,True,Bajra(0.162) > Maize(0.338) > Groundnut(0.376) > Jowar(0.475) > Rice(0.494),1200,400,66.7,0.0,Jowar,1320.2
 Perambalur,Groundwater-dependent,1.0,0.103,1yr,Kuruvai,6.06,Slow depletion,Maize,Bajra,True,Bajra(0.176) > Maize(0.351) > Groundnut(0.390) > Jowar(0.488) > Rice(0.507),1200,400,66.7,0.0,Jowar,1320.2
 Perambalur,Groundwater-dependent,1.0,0.103,3yr,Samba,6.03,Slow depletion,Maize,Bajra,True,Bajra(0.162) > Maize(0.338) > Groundnut(0.376) > Jowar(0.475) > Rice(0.494),1200,400,66.7,0.0,Jowar,1320.2
@@ -125,12 +125,12 @@ Ranipet,Groundwater-dependent,0.948,-0.136,3yr,Samba,4.81,Stable/recovering,Rice
 Ranipet,Groundwater-dependent,0.948,-0.136,3yr,Kuruvai,4.81,Stable/recovering,Rice,Bajra,True,Bajra(0.169) > Jowar(0.228) > Groundnut(0.287) > Maize(0.327) > Rice(0.584),2500,400,84.0,0.431,Rice,2216.5
 Ranipet,Groundwater-dependent,0.948,-0.136,5yr,Samba,4.85,Stable/recovering,Rice,Bajra,True,Bajra(0.178) > Jowar(0.237) > Groundnut(0.296) > Maize(0.336) > Rice(0.593),2500,400,84.0,0.431,Rice,2216.5
 Ranipet,Groundwater-dependent,0.948,-0.136,5yr,Kuruvai,4.85,Stable/recovering,Rice,Bajra,True,Bajra(0.169) > Jowar(0.228) > Groundnut(0.287) > Maize(0.327) > Rice(0.584),2500,400,84.0,0.431,Rice,2216.5
-Salem,Groundwater-dependent,0.993,-0.298,1yr,Samba,6.19,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.324) > Maize(0.347) > Bajra(0.382) > Jowar(0.427) > Rice(0.503),700,1000,0.0,0.0,Jowar,1191.2
-Salem,Groundwater-dependent,0.993,-0.298,1yr,Kuruvai,6.19,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.311) > Maize(0.335) > Bajra(0.369) > Jowar(0.414) > Rice(0.491),700,1000,0.0,0.0,Jowar,1191.2
-Salem,Groundwater-dependent,0.993,-0.298,3yr,Samba,6.16,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.324) > Maize(0.347) > Bajra(0.382) > Jowar(0.427) > Rice(0.503),700,1000,0.0,0.0,Jowar,1191.2
-Salem,Groundwater-dependent,0.993,-0.298,3yr,Kuruvai,6.16,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.311) > Maize(0.335) > Bajra(0.369) > Jowar(0.414) > Rice(0.491),700,1000,0.0,0.0,Jowar,1191.2
-Salem,Groundwater-dependent,0.993,-0.298,5yr,Samba,6.1,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.324) > Maize(0.347) > Bajra(0.382) > Jowar(0.427) > Rice(0.503),700,1000,0.0,0.0,Jowar,1191.2
-Salem,Groundwater-dependent,0.993,-0.298,5yr,Kuruvai,6.1,Stable/recovering,Jowar,Groundnut,True,Groundnut(0.311) > Maize(0.335) > Bajra(0.369) > Jowar(0.414) > Rice(0.491),700,1000,0.0,0.0,Jowar,1191.2
+Salem,Groundwater-dependent,0.993,-0.298,1yr,Samba,6.19,Stable/recovering,Jowar,Bajra,True,Groundnut(0.324) > Maize(0.347) > Bajra(0.382) > Jowar(0.427) > Rice(0.503),700,400,42.9,0.0,Jowar,1191.2
+Salem,Groundwater-dependent,0.993,-0.298,1yr,Kuruvai,6.19,Stable/recovering,Jowar,Bajra,True,Groundnut(0.311) > Maize(0.335) > Bajra(0.369) > Jowar(0.414) > Rice(0.491),700,400,42.9,0.0,Jowar,1191.2
+Salem,Groundwater-dependent,0.993,-0.298,3yr,Samba,6.16,Stable/recovering,Jowar,Bajra,True,Groundnut(0.324) > Maize(0.347) > Bajra(0.382) > Jowar(0.427) > Rice(0.503),700,400,42.9,0.0,Jowar,1191.2
+Salem,Groundwater-dependent,0.993,-0.298,3yr,Kuruvai,6.16,Stable/recovering,Jowar,Bajra,True,Groundnut(0.311) > Maize(0.335) > Bajra(0.369) > Jowar(0.414) > Rice(0.491),700,400,42.9,0.0,Jowar,1191.2
+Salem,Groundwater-dependent,0.993,-0.298,5yr,Samba,6.1,Stable/recovering,Jowar,Bajra,True,Groundnut(0.324) > Maize(0.347) > Bajra(0.382) > Jowar(0.427) > Rice(0.503),700,400,42.9,0.0,Jowar,1191.2
+Salem,Groundwater-dependent,0.993,-0.298,5yr,Kuruvai,6.1,Stable/recovering,Jowar,Bajra,True,Groundnut(0.311) > Maize(0.335) > Bajra(0.369) > Jowar(0.414) > Rice(0.491),700,400,42.9,0.0,Jowar,1191.2
 Sivaganga,Surface-water dominant,0.287,0.075,1yr,Samba,4.54,Slow depletion,Rice,Groundnut,True,Groundnut(0.118) > Maize(0.171) > Bajra(0.215) > Jowar(0.333) > Rice(0.388),2500,1000,60.0,0.0,Jowar,2463.2
 Sivaganga,Surface-water dominant,0.287,0.075,1yr,Kuruvai,4.54,Slow depletion,Rice,Groundnut,True,Groundnut(0.126) > Maize(0.179) > Bajra(0.223) > Jowar(0.341) > Rice(0.395),2500,1000,60.0,0.0,Jowar,2463.2
 Sivaganga,Surface-water dominant,0.287,0.075,3yr,Samba,4.41,Slow depletion,Rice,Groundnut,True,Groundnut(0.118) > Maize(0.171) > Bajra(0.215) > Jowar(0.333) > Rice(0.388),2500,1000,60.0,0.0,Jowar,2463.2

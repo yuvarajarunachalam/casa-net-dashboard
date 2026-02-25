@@ -35,21 +35,16 @@ function ImageCard({ title, description, src, alt }) {
 
 export default function ModelView({ modelMetrics }) {
   // Pull CASA-Net test metrics from model_comparison_metrics.csv if available
-  const casaRow  = modelMetrics?.find(r => r.Model?.toLowerCase().includes('casa'))
-  const arimaRow = modelMetrics?.find(r => r.Model?.toLowerCase().includes('arima'))
-  const lstmRow  = modelMetrics?.find(r => r.Model?.toLowerCase().includes('lstm'))
+  const casaRow  = modelMetrics?.find(r => r.Model?.includes('CASA'))
+  const arimaRow = modelMetrics?.find(r => r.Model?.includes('ARIMA'))
 
-  const rmse  = casaRow?.RMSE_1yr ?? casaRow?.RMSE ?? '0.842'
-  const mae   = casaRow?.MAE_1yr  ?? casaRow?.MAE  ?? '0.677'
-  const mape  = casaRow?.MAPE_1yr ?? casaRow?.MAPE ?? '11.9'
+  const rmse  = casaRow?.['RMSE (m)']  ?? '—'
+  const mae   = casaRow?.['MAE (m)']   ?? '—'
+  const mape  = casaRow?.['MAPE (%)']  ?? '—'
 
-  // Percentage improvement over baseline models
-  const vsArima = arimaRow?.RMSE_1yr
-    ? ((arimaRow.RMSE_1yr - rmse) / arimaRow.RMSE_1yr * 100).toFixed(0)
-    : '61'
-  const vsLstm  = lstmRow?.RMSE_1yr
-    ? ((lstmRow.RMSE_1yr - rmse) / lstmRow.RMSE_1yr * 100).toFixed(0)
-    : '16'
+  const vsArima = (arimaRow?.['RMSE (m)'] && casaRow?.['RMSE (m)'])
+    ? ((arimaRow['RMSE (m)'] - casaRow['RMSE (m)']) / arimaRow['RMSE (m)'] * 100).toFixed(1)
+    : '—'
 
   return (
     <div className="page-container">
@@ -60,10 +55,10 @@ export default function ModelView({ modelMetrics }) {
 
       {/* Key metrics row */}
       <div className="model-metrics-row">
-        <MetricCard label="Test RMSE" value={Number(rmse).toFixed(3)} unit="m" note="1yr forecast" />
-        <MetricCard label="Test MAE"  value={Number(mae).toFixed(3)}  unit="m" note="1yr forecast" />
-        <MetricCard label="MAPE"      value={Number(mape).toFixed(1)}  unit="%" note="1yr forecast" />
-        <MetricCard label="vs ARIMA"  value={`-${vsArima}`} unit="%" note="RMSE improvement" />
+        <MetricCard label="Test RMSE" value={rmse === '—' ? '—' : Number(rmse).toFixed(3)} unit={rmse === '—' ? '' : 'm'} note="1yr forecast" />
+        <MetricCard label="Test MAE"  value={mae  === '—' ? '—' : Number(mae).toFixed(3)}  unit={mae  === '—' ? '' : 'm'} note="1yr forecast" />
+        <MetricCard label="MAPE"      value={mape  === '—' ? '—' : Number(mape).toFixed(1)}  unit={mape  === '—' ? '' : '%'} note="1yr forecast" />
+        <MetricCard label="vs ARIMA"  value={vsArima === '—' ? '—' : `+${vsArima}`} unit={vsArima === '—' ? '' : '%'} note="RMSE improvement" />
       </div>
 
       {/* Global SHAP beeswarm */}

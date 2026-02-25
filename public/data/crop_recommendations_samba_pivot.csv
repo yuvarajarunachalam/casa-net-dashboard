@@ -2,7 +2,7 @@ District,Leading_Current_Crop_1yr,Leading_Current_Crop_3yr,Leading_Current_Crop_
 Ariyalur,Rice,Rice,Rice,84.0,84.0,84.0,4.05,3.99,3.98,True,True,True,Bajra,Bajra,Bajra
 Chengalpattu,Rice,Rice,Rice,84.0,84.0,84.0,2.92,2.92,2.87,True,True,True,Bajra,Bajra,Bajra
 Chennai,Rice,Rice,Rice,84.0,84.0,84.0,3.88,3.87,3.87,True,True,True,Bajra,Bajra,Bajra
-Coimbatore,Jowar,Jowar,Jowar,0.0,0.0,0.0,11.66,11.77,11.77,False,False,False,Groundnut,Groundnut,Groundnut
+Coimbatore,Jowar,Jowar,Jowar,42.9,42.9,42.9,11.66,11.77,11.77,False,False,False,Bajra,Bajra,Bajra
 Cuddalore,Rice,Rice,Rice,84.0,84.0,84.0,5.18,5.2,5.16,True,True,True,Bajra,Bajra,Bajra
 Dharmapuri,Jowar,Jowar,Jowar,42.9,42.9,42.9,7.48,7.57,7.42,True,True,True,Bajra,Bajra,Bajra
 Dindigul,Jowar,Jowar,Jowar,42.9,42.9,42.9,7.41,7.45,7.37,True,True,True,Bajra,Bajra,Bajra
@@ -10,17 +10,17 @@ Erode,Rice,Rice,Rice,60.0,60.0,60.0,5.95,5.95,5.89,True,True,True,Groundnut,Grou
 Kallakurichi,Rice,Rice,Rice,84.0,84.0,84.0,6.63,6.61,6.6,True,True,True,Bajra,Bajra,Bajra
 Kanchipuram,Rice,Rice,Rice,84.0,84.0,84.0,2.24,2.18,2.14,True,True,True,Bajra,Bajra,Bajra
 Kanniyakumari,Rice,Rice,Rice,84.0,84.0,84.0,5.01,5.03,5.11,True,True,True,Bajra,Bajra,Bajra
-Karur,Jowar,Jowar,Jowar,0.0,0.0,0.0,5.01,4.96,4.88,True,True,True,Groundnut,Groundnut,Groundnut
+Karur,Jowar,Jowar,Jowar,42.9,42.9,42.9,5.01,4.96,4.88,True,True,True,Bajra,Bajra,Bajra
 Krishnagiri,Rice,Rice,Rice,72.0,72.0,72.0,7.5,7.72,7.5,True,True,True,Jowar,Jowar,Jowar
 Madurai,Rice,Rice,Rice,84.0,84.0,84.0,5.26,5.27,5.24,True,True,True,Bajra,Bajra,Bajra
 Mayiladuthurai,Rice,Rice,Rice,84.0,84.0,84.0,1.75,1.74,1.73,True,True,True,Bajra,Bajra,Bajra
 Nagapattinam,Rice,Rice,Rice,84.0,84.0,84.0,2.86,2.86,2.87,True,True,True,Bajra,Bajra,Bajra
-Namakkal,Jowar,Jowar,Jowar,0.0,0.0,0.0,9.54,9.57,9.51,False,False,False,Groundnut,Groundnut,Groundnut
+Namakkal,Jowar,Jowar,Jowar,42.9,42.9,42.9,9.54,9.57,9.51,False,False,False,Bajra,Bajra,Bajra
 Perambalur,Maize,Maize,Maize,66.7,66.7,66.7,6.06,6.03,5.98,True,True,True,Bajra,Bajra,Bajra
 Pudukkottai,Rice,Rice,Rice,72.0,72.0,72.0,5.08,5.06,5.04,True,True,True,Jowar,Jowar,Jowar
 Ramanathapuram,Rice,Rice,Rice,52.0,52.0,52.0,4.15,4.16,4.15,True,True,True,Maize,Maize,Maize
 Ranipet,Rice,Rice,Rice,84.0,84.0,84.0,4.85,4.81,4.85,True,True,True,Bajra,Bajra,Bajra
-Salem,Jowar,Jowar,Jowar,0.0,0.0,0.0,6.19,6.16,6.1,True,True,True,Groundnut,Groundnut,Groundnut
+Salem,Jowar,Jowar,Jowar,42.9,42.9,42.9,6.19,6.16,6.1,True,True,True,Bajra,Bajra,Bajra
 Sivaganga,Rice,Rice,Rice,60.0,60.0,60.0,4.54,4.41,4.41,True,True,True,Groundnut,Groundnut,Groundnut
 Thanjavur,Rice,Rice,Rice,84.0,84.0,84.0,3.34,3.35,3.34,True,True,True,Bajra,Bajra,Bajra
 The nilgiris,Rice,Rice,Rice,84.0,84.0,84.0,2.44,2.43,2.43,True,True,True,Bajra,Bajra,Bajra
