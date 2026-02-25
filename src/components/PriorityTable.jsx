@@ -27,7 +27,7 @@ function TierSection({ tier, rows, onSelectDistrict }) {
                 <th>Depth (5yr)</th>
                 <th>Trend</th>
                 <th>GW Dep.</th>
-                <th>Recommended Crop</th>
+                <th>Recommended Action</th>
                 <th>Water Saving</th>
                 <th>Feasibility</th>
               </tr>
