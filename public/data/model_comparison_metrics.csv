@@ -1,0 +1,5 @@
+Model,RMSE (m),MAE (m),MAPE (%)
+Naive Baseline,1.923,1.459,26.3
+ARIMA,2.16,1.64,30.6
+LSTM,1.007,0.786,13.1
+CASA-Net (ours),0.842,0.677,11.9

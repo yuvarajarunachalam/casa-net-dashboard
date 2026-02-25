@@ -1,0 +1,39 @@
+District,Tier,Tier_Label,Tier_Color,CASA_Pred_1yr,CASA_Pred_3yr,CASA_Pred_5yr,GW_Trend_m_per_yr,GW_Dep_Ratio,Recommended_Crop,GW_Severity
+Ariyalur,3,Monitor (3-5 year horizon),#f1c40f,4.051839,3.9921668,3.9807014,-0.22963636363633447,0.919897092616645,Bajra,Slow depletion
+Chengalpattu,3,Monitor (3-5 year horizon),#f1c40f,2.9243042,2.918535,2.8711734,-0.9449999999996402,0.47723980645360126,Bajra,Slow depletion
+Chennai,3,Monitor (3-5 year horizon),#f1c40f,3.8763824,3.8653183,3.868024,-0.3004553049290253,0.7852112676056338,Bajra,Stable/recovering
+Coimbatore,1,Act Now (within 1 year),#c0392b,11.6570835,11.774946,11.772814,0.12872727272730658,0.8717845219775138,Groundnut,Stable/recovering
+Cuddalore,2,Plan Now (within 3 years),#e67e22,5.176195,5.1978173,5.1633987,-0.14063636363635246,0.6714114806828521,Bajra,Stable/recovering
+Dharmapuri,2,Plan Now (within 3 years),#e67e22,7.479228,7.5677304,7.416404,-0.15845454545453808,1.0,Bajra,Stable/recovering
+Dindigul,2,Plan Now (within 3 years),#e67e22,7.409502,7.451051,7.368017,-0.13390909090905362,0.887579656126007,Bajra,Stable/recovering
+Erode,2,Plan Now (within 3 years),#e67e22,5.949663,5.947173,5.894523,-0.21381818181815093,0.5920192258700046,Groundnut,Stable/recovering
+Kallakurichi,2,Plan Now (within 3 years),#e67e22,6.63108,6.6143856,6.601152,-3.2500000000000644,0.8536794759336331,Bajra,Stable/recovering
+Kanchipuram,3,Monitor (3-5 year horizon),#f1c40f,2.2367806,2.1783116,2.1424074,0.10862407862407553,0.36490402476780187,Bajra,Slow depletion
+Kanniyakumari,2,Plan Now (within 3 years),#e67e22,5.0055676,5.032041,5.112835,-0.14563636363636018,0.2512003939754586,Bajra,Slow depletion
+Karur,3,Monitor (3-5 year horizon),#f1c40f,5.0087514,4.957019,4.878057,-0.41409090909088453,0.8969140792163949,Groundnut,Stable/recovering
+Krishnagiri,2,Plan Now (within 3 years),#e67e22,7.49793,7.7228007,7.501133,0.012545454545455997,0.8838969859912268,Jowar,Stable/recovering
+Madurai,2,Plan Now (within 3 years),#e67e22,5.258489,5.265009,5.23906,0.0069090909091160555,0.6561978789690657,Bajra,Stable/recovering
+Mayiladuthurai,4,"Stable (canal-fed, low GW pressure)",#27ae60,1.7499758,1.7412941,1.7328233,-2.6432542602993796e-16,0.0,Bajra,Moderate depletion
+Nagapattinam,4,"Stable (canal-fed, low GW pressure)",#27ae60,2.8595245,2.8645,2.870481,0.040999999999995235,0.0,Bajra,Stable/recovering
+Namakkal,1,Act Now (within 1 year),#c0392b,9.537304,9.572171,9.513928,-0.28781818181815044,0.9045847121339027,Groundnut,Stable/recovering
+Perambalur,2,Plan Now (within 3 years),#e67e22,6.0626125,6.029174,5.9830813,-0.0967272727272469,1.0,Bajra,Slow depletion
+Pudukkottai,2,Plan Now (within 3 years),#e67e22,5.0793962,5.0552726,5.0437775,-0.07145454545453672,0.5337154530566764,Jowar,Moderate depletion
+Ramanathapuram,3,Monitor (3-5 year horizon),#f1c40f,4.14694,4.1566715,4.149792,-0.008636363636356661,0.1793598401114375,Maize,Stable/recovering
+Ranipet,3,Monitor (3-5 year horizon),#f1c40f,4.8510118,4.8141875,4.8474445,-1.7950000000001487,0.9482203129794415,Bajra,Stable/recovering
+Salem,2,Plan Now (within 3 years),#e67e22,6.190467,6.162482,6.1034284,-0.4142727272726775,0.9932239297844436,Groundnut,Stable/recovering
+Sivaganga,3,Monitor (3-5 year horizon),#f1c40f,4.541136,4.4122024,4.407169,-0.10509090909087732,0.28675754625121713,Groundnut,Slow depletion
+Thanjavur,3,Monitor (3-5 year horizon),#f1c40f,3.3386796,3.35496,3.3444405,-0.16081818181816415,0.3644808834415928,Bajra,Slow depletion
+The nilgiris,3,Monitor (3-5 year horizon),#f1c40f,2.4369214,2.4343178,2.4260361,-0.026090909090912273,0.9857308137292711,Bajra,Stable/recovering
+Theni,1,Act Now (within 1 year),#c0392b,9.07467,9.08945,9.013668,-0.37872727272721385,0.7688032898810753,Bajra,Stable/recovering
+Thenkasi,2,Plan Now (within 3 years),#e67e22,5.394734,5.378708,5.3568907,-2.1450000000000764,0.5560810608555093,Bajra,Slow depletion
+Thiruvallur,3,Monitor (3-5 year horizon),#f1c40f,4.004706,4.01555,4.008769,0.03009090909090991,0.8872451299269052,Jowar,Stable/recovering
+Thiruvarur,4,"Stable (canal-fed, low GW pressure)",#27ae60,2.9070072,2.9151537,2.939524,0.1502727272727169,0.0,Jowar,Stable/recovering
+Thoothukudi,3,Monitor (3-5 year horizon),#f1c40f,4.643111,4.6457,4.6309967,-0.13245454545452637,0.512035243226029,Groundnut,Stable/recovering
+Tiruchirappalli,2,Plan Now (within 3 years),#e67e22,6.5523376,6.574865,6.541923,-0.18272727272724157,0.745566833802128,Bajra,Stable/recovering
+Tirunelveli,3,Monitor (3-5 year horizon),#f1c40f,4.6832895,4.664403,4.629324,-0.1567272727272523,0.4650698958240584,Jowar,Slow depletion
+Tirupathur,3,Monitor (3-5 year horizon),#f1c40f,4.873682,4.704611,4.759498,-2.9500000000004634,1.0,Bajra,Stable/recovering
+Tiruppur,1,Act Now (within 1 year),#c0392b,9.327815,9.293948,9.227469,-0.2327727272726841,0.7661290322580645,Bajra,Stable/recovering
+Tiruvannamalai,3,Monitor (3-5 year horizon),#f1c40f,5.02325,4.9429536,4.90002,-0.0979090909090771,0.9436353857997026,Jowar,Stable/recovering
+Vellore,2,Plan Now (within 3 years),#e67e22,5.5327992,5.5099974,5.4240313,-0.25981818181815197,0.9996809044080777,Bajra,Stable/recovering
+Villupuram,3,Monitor (3-5 year horizon),#f1c40f,4.8495097,4.8212,4.855078,-0.09563636363634902,0.848919242304166,Groundnut,Stable/recovering
+Virudhunagar,2,Plan Now (within 3 years),#e67e22,7.9440913,7.9659753,7.9598813,-0.06209090909088769,0.5491770090661033,Bajra,Stable/recovering
