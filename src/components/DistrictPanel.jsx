@@ -28,7 +28,7 @@ function FeasibilityBar({ score }) {
   )
 }
 
-export default function DistrictPanel({ district, districtData, gwHistory }) {
+export default function DistrictPanel({ district, districtData, gwHistory, onOpenPolicy }) {
   const { narrative, loading, source, fetchNarrative } = useNarrative()
 
   // Trigger AI narrative fetch whenever the selected district changes
@@ -63,6 +63,26 @@ export default function DistrictPanel({ district, districtData, gwHistory }) {
         <span className="tier-badge" style={{ background: tierColor }}>
           Tier {d.Tier} — {TIER_LABELS[d.Tier]}
         </span>
+        {onOpenPolicy && (
+          <button
+            onClick={() => onOpenPolicy(district)}
+            style={{
+              marginLeft   : 'auto',
+              background   : '#1c2e4a',
+              color        : 'white',
+              border       : 'none',
+              borderRadius : 6,
+              padding      : '5px 12px',
+              fontSize     : 11,
+              fontWeight   : 600,
+              cursor       : 'pointer',
+              flexShrink   : 0,
+              letterSpacing: '0.3px',
+            }}
+          >
+            Full Analysis →
+          </button>
+        )}
       </div>
 
       <div className="panel-body">

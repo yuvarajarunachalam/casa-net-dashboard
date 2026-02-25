@@ -4,6 +4,7 @@ const TABS = [
   { id: 'map',        label: 'Overview Map' },
   { id: 'priorities', label: 'Priority Districts' },
   { id: 'scenarios',  label: 'Scenarios' },
+  { id: 'policy',     label: 'Policy Analysis' },
   { id: 'model',      label: 'Model & Explainability' },
 ]
 

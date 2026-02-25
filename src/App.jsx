@@ -7,6 +7,7 @@ import AIInsightsPanel from './components/AIInsightsPanel'
 import PriorityTable from './components/PriorityTable'
 import ScenarioPlanner from './components/ScenarioPlanner'
 import ModelView from './components/ModelView'
+import PolicyPage from './components/PolicyPage'
 
 export default function App() {
   const [data,             setData]             = useState(null)
@@ -27,6 +28,12 @@ export default function App() {
   const handleSelectDistrict = useCallback((district) => {
     setSelectedDistrict(district)
     setActiveTab('map')
+  }, [])
+
+  // Navigate directly to Policy Analysis for a given district
+  const handleOpenPolicy = useCallback((district) => {
+    setSelectedDistrict(district)
+    setActiveTab('policy')
   }, [])
 
   if (loading) {
@@ -78,6 +85,7 @@ export default function App() {
               district={selectedDistrict}
               districtData={districtData}
               gwHistory={data.gwHistory}
+              onOpenPolicy={handleOpenPolicy}
             />
             <AIInsightsPanel
               policySummary={data.policySummary}
@@ -107,6 +115,15 @@ export default function App() {
         {/* Model and Explainability tab */}
         {activeTab === 'model' && (
           <ModelView modelMetrics={data.modelMetrics} />
+        )}
+
+        {/* Policy Analysis tab */}
+        {activeTab === 'policy' && (
+          <PolicyPage
+            geojson={data.geojson}
+            byDistrict={data.byDistrict}
+            policySummary={data.policySummary}
+          />
         )}
 
       </main>
