@@ -1,21 +1,23 @@
 import React from 'react'
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis,
-  CartesianGrid, Tooltip, ReferenceLine, Legend
+  CartesianGrid, Tooltip, ReferenceLine
 } from 'recharts'
 
-// Custom tooltip shown on hover over the chart
+// Custom tooltip — only shows non-null values
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
+  const items = payload.filter(p => p.value != null)
+  if (!items.length) return null
   return (
     <div style={{
       background: '#fff', border: '1px solid #dde3ea',
       borderRadius: 6, padding: '8px 12px', fontSize: 12
     }}>
       <div style={{ fontWeight: 700, marginBottom: 4 }}>{label}</div>
-      {payload.map(p => (
+      {items.map(p => (
         <div key={p.dataKey} style={{ color: p.color }}>
-          {p.name}: {p.value?.toFixed(2)}m
+          {p.name}: {Number(p.value).toFixed(2)}m
         </div>
       ))}
     </div>
@@ -24,23 +26,45 @@ function CustomTooltip({ active, payload, label }) {
 
 export default function GWChart({ history }) {
   if (!history?.length) {
-    return <div className="text-muted text-sm" style={{ padding: '20px 0' }}>No historical data available.</div>
+    return (
+      <div className="text-muted text-sm" style={{ padding: '20px 0' }}>
+        No historical data available.
+      </div>
+    )
   }
 
-  // Split into observed and predicted series for different line styles
-  const observed  = history.filter(d => !d.predicted)
-  const predicted = history.filter(d => d.predicted)
-
-  // Combine for a single x-axis domain
-  const allData   = [...observed, ...predicted].sort((a, b) => a.year - b.year)
-
-  // The junction year (last observed) gets a point in both series for visual continuity
+  // Separate observed and predicted points
+  const observed  = history.filter(d => !d.predicted).sort((a, b) => a.year - b.year)
+  const predicted = history.filter(d =>  d.predicted).sort((a, b) => a.year - b.year)
   const lastObs   = observed[observed.length - 1]
-  const predData  = lastObs ? [lastObs, ...predicted] : predicted
+
+  // Build a single unified array sorted by year.
+  // Each entry has gw_observed and/or gw_predicted — null where absent.
+  // The junction year appears in BOTH keys so both lines connect at that point.
+  const yearMap = {}
+
+  for (const d of observed) {
+    yearMap[d.year] = { year: d.year, gw_observed: d.gw_may, gw_predicted: null }
+  }
+
+  // Junction point: last observed value appears in both series
+  if (lastObs) {
+    yearMap[lastObs.year].gw_predicted = lastObs.gw_may
+  }
+
+  for (const d of predicted) {
+    if (yearMap[d.year]) {
+      yearMap[d.year].gw_predicted = d.gw_may
+    } else {
+      yearMap[d.year] = { year: d.year, gw_observed: null, gw_predicted: d.gw_may }
+    }
+  }
+
+  const chartData = Object.values(yearMap).sort((a, b) => a.year - b.year)
 
   return (
     <ResponsiveContainer width="100%" height={180}>
-      <LineChart data={allData} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
+      <LineChart data={chartData} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
         <XAxis
           dataKey="year"
@@ -50,43 +74,48 @@ export default function GWChart({ history }) {
         <YAxis
           tick={{ fontSize: 11 }}
           tickLine={false}
-          label={{ value: 'Depth (m)', angle: -90, position: 'insideLeft', offset: 14, style: { fontSize: 10 } }}
           reversed={true}
+          label={{
+            value: 'Depth (m)', angle: -90,
+            position: 'insideLeft', offset: 14,
+            style: { fontSize: 10 }
+          }}
         />
         <Tooltip content={<CustomTooltip />} />
 
-        {/* Vertical line marking transition from observed to forecast */}
         {lastObs && (
           <ReferenceLine
             x={lastObs.year}
             stroke="#aaa"
             strokeDasharray="4 3"
-            label={{ value: 'Forecast →', position: 'insideTopRight', fontSize: 10, fill: '#999' }}
+            label={{
+              value: 'Forecast →',
+              position: 'insideTopRight',
+              fontSize: 10, fill: '#999'
+            }}
           />
         )}
 
-        {/* Observed historical GW depth */}
+        {/* Observed historical GW depth — solid blue line */}
         <Line
-          data={observed}
-          dataKey="gw_may"
+          dataKey="gw_observed"
           name="Observed GW depth"
           stroke="#2980b9"
           strokeWidth={2}
           dot={{ r: 2 }}
           activeDot={{ r: 4 }}
-          connectNulls
+          connectNulls={false}
         />
 
-        {/* CASA-Net predicted depth */}
+        {/* CASA-Net forecast — dashed red line starting from last observed point */}
         <Line
-          data={predData}
-          dataKey="gw_may"
+          dataKey="gw_predicted"
           name="CASA-Net forecast"
           stroke="#c0392b"
           strokeWidth={2}
           strokeDasharray="5 3"
           dot={{ r: 3, fill: '#c0392b' }}
-          connectNulls
+          connectNulls={false}
         />
       </LineChart>
     </ResponsiveContainer>
