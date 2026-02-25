@@ -44,7 +44,23 @@ function TierSection({ tier, rows, onSelectDistrict }) {
                     </span>
                   </td>
                   <td>{Math.round((d.GW_Dep_Ratio || 0) * 100)}%</td>
-                  <td>{d.Recommended_Crop}</td>
+                  <td>
+                    <span style={{
+                      display: 'inline-block',
+                      fontSize: 10, fontWeight: 700,
+                      padding: '2px 6px', borderRadius: 8,
+                      marginRight: 6,
+                      background:
+                        d.Recommendation_Type === 'Switch'   ? '#fdecea' :
+                        d.Recommendation_Type === 'Advisory' ? '#fef9e7' : '#eafaf1',
+                      color:
+                        d.Recommendation_Type === 'Switch'   ? '#c0392b' :
+                        d.Recommendation_Type === 'Advisory' ? '#b7950b' : '#1e8449',
+                    }}>
+                      {d.Recommendation_Type || 'Maintain'}
+                    </span>
+                    {d.Recommended_Crop}
+                  </td>
                   <td style={{ color: '#27ae60', fontWeight: 600 }}>
                     {d.Potential_Water_Saving_pct?.toFixed(1)}%
                   </td>

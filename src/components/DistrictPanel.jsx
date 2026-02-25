@@ -110,25 +110,47 @@ export default function DistrictPanel({ district, districtData, gwHistory }) {
         {/* Crop recommendation */}
         <div>
           <div className="section-title">Crop Recommendation (Samba 1yr)</div>
-          <div className="rec-card">
+          <div className="rec-card" style={{
+            borderLeftColor:
+              d.Recommendation_Type === 'Switch'   ? '#c0392b' :
+              d.Recommendation_Type === 'Advisory' ? '#e67e22' : '#27ae60'
+          }}>
             <div className="rec-row">
-              <span className="rec-label">Recommended Crop</span>
-              <span className="rec-value">{d.Recommended_Crop || '—'}</span>
-            </div>
-            <div className="rec-row">
-              <span className="rec-label">Potential Water Saving</span>
-              <span className="rec-value" style={{ color: '#27ae60' }}>
-                {d.Potential_Water_Saving_pct?.toFixed(1)}%
+              <span className="rec-label">Recommendation</span>
+              <span className="rec-value" style={{
+                color:
+                  d.Recommendation_Type === 'Switch'   ? '#c0392b' :
+                  d.Recommendation_Type === 'Advisory' ? '#e67e22' : '#27ae60',
+                fontSize: 12
+              }}>
+                {d.Recommendation_Type || '—'}
               </span>
             </div>
-            <div className="rec-row">
-              <span className="rec-label">Current Water Req.</span>
-              <span className="rec-value">{d.Current_Water_Req_Lkg?.toLocaleString()} L/kg</span>
+            <div style={{ fontSize: 12, lineHeight: 1.6, color: '#2c3e50', marginBottom: 8 }}>
+              {d.Recommendation_Text || '—'}
             </div>
-            <div className="rec-row">
-              <span className="rec-label">Recommended Req.</span>
-              <span className="rec-value">{d.Recommended_Water_Req_Lkg?.toLocaleString()} L/kg</span>
-            </div>
+            {d.Recommendation_Type !== 'Maintain' && (
+              <>
+                <div className="rec-row">
+                  <span className="rec-label">Target Crop</span>
+                  <span className="rec-value">{d.Recommended_Crop || '—'}</span>
+                </div>
+                <div className="rec-row">
+                  <span className="rec-label">Water Saving</span>
+                  <span className="rec-value" style={{ color: '#27ae60' }}>
+                    {d.Potential_Water_Saving_pct?.toFixed(1)}%
+                  </span>
+                </div>
+                <div className="rec-row">
+                  <span className="rec-label">Current Req.</span>
+                  <span className="rec-value">{d.Current_Water_Req_Lkg?.toLocaleString()} L/kg</span>
+                </div>
+                <div className="rec-row">
+                  <span className="rec-label">Target Req.</span>
+                  <span className="rec-value">{d.Recommended_Water_Req_Lkg?.toLocaleString()} L/kg</span>
+                </div>
+              </>
+            )}
             <div style={{ marginTop: 10 }}>
               <FeasibilityBar score={d.Feasibility_Score || 0} />
             </div>
