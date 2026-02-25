@@ -1,11 +1,11 @@
 // api/narrative.js
 // Vercel serverless function — receives district data from the React app
-// and returns a Gemini-generated policy narrative.
-// The API key is stored as a Vercel environment variable (GEMINI_API_KEY)
+// and returns a Groq-generated policy narrative.
+// The API key is stored as a Vercel environment variable (GROQ_API_KEY)
 // and never exposed to the browser.
 //
 // Fallback chain:
-//   1. Gemini 2.0 Flash
+//   1. Groq (llama-3.1-8b-instant — free tier, fast)
 //   2. Precomputed narrative from request body (always present)
 
 export default async function handler(req, res) {
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
           gw_dependency, shap_top_driver, flood_risk, drought_risk,
           fallback_narrative } = req.body
 
-  const apiKey = process.env.GEMINI_API_KEY
+  const apiKey = process.env.GROQ_API_KEY
 
   if (!apiKey) {
     return res.status(200).json({
@@ -47,30 +47,34 @@ Write only the brief, no headings or bullet points.`
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      'https://api.groq.com/openai/v1/chat/completions',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 150, temperature: 0.3 }
+          model: 'llama-3.1-8b-instant',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 150,
+          temperature: 0.3
         })
       }
     )
 
     if (!response.ok) {
-      throw new Error(`Gemini API returned ${response.status}`)
+      throw new Error(`Groq API returned ${response.status}`)
     }
 
     const data = await response.json()
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+    const text = data.choices?.[0]?.message?.content?.trim()
 
-    if (!text) throw new Error('Empty response from Gemini')
+    if (!text) throw new Error('Empty response from Groq')
 
-    return res.status(200).json({ narrative: text, source: 'gemini' })
+    return res.status(200).json({ narrative: text, source: 'groq' })
 
   } catch (err) {
-    // Always return something useful — never leave the UI empty
     return res.status(200).json({
       narrative: fallback_narrative || 'Narrative generation failed.',
       source: 'precomputed'

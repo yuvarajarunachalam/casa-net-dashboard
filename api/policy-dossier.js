@@ -1,8 +1,8 @@
 // api/policy-dossier.js
 // Vercel serverless function for the Policy Analysis page.
 // Receives a section type and district data from the React app,
-// calls Gemini server-side, and returns the generated text.
-// The API key is stored as GEMINI_API_KEY in Vercel environment variables
+// calls Groq server-side, and returns the generated text.
+// The API key is stored as GROQ_API_KEY in Vercel environment variables
 // and is never exposed to the browser.
 //
 // Section types:
@@ -11,8 +11,8 @@
 //   contingency    — flood + drought risk across the full year
 //   comparable     — how this district compares to similar ones
 
-const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
+const GROQ_MODEL = 'llama-3.1-8b-instant'
 
 function buildPromptRecommendation(d, cropPolicy, schemes) {
   const schemeList = schemes.join(', ')
@@ -127,12 +127,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing section or districtData' })
   }
 
-  const apiKey = process.env.GEMINI_API_KEY
+  const apiKey = process.env.GROQ_API_KEY
   if (!apiKey) {
     return res.status(200).json({
       text  : null,
       source: 'no_key',
-      error : 'GEMINI_API_KEY not configured in Vercel environment variables.',
+      error : 'GROQ_API_KEY not configured in Vercel environment variables.',
     })
   }
 
@@ -144,26 +144,31 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(`${GEMINI_URL}${apiKey}`, {
+    const response = await fetch(GROQ_URL, {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({
-        contents        : [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 200, temperature: 0.3 },
+      headers: {
+        'Content-Type' : 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model      : GROQ_MODEL,
+        messages   : [{ role: 'user', content: prompt }],
+        max_tokens : 200,
+        temperature: 0.3,
       }),
     })
 
     if (!response.ok) {
       const body = await response.text()
-      throw new Error(`Gemini ${response.status}: ${body}`)
+      throw new Error(`Groq ${response.status}: ${body}`)
     }
 
     const data = await response.json()
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+    const text = data.choices?.[0]?.message?.content?.trim()
 
-    if (!text) throw new Error('Empty response from Gemini')
+    if (!text) throw new Error('Empty response from Groq')
 
-    return res.status(200).json({ text, source: 'gemini' })
+    return res.status(200).json({ text, source: 'groq' })
 
   } catch (err) {
     return res.status(200).json({
