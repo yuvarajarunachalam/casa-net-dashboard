@@ -126,8 +126,8 @@ export default function AIInsightsPanel({ policySummary, onSelectDistrict, selec
         <h3>Top 5 Priority Districts</h3>
         <p>
           {hasApiKey
-            ? `AI briefs loading... (${fetchedCount}/${top5.length})`
-            : 'Precomputed briefs — add VITE_GEMINI_API_KEY for AI'}
+            ? `AI briefs`
+            : ''}
         </p>
       </div>
 
