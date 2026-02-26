@@ -159,8 +159,7 @@ export default function PolicyPage({ geojson, byDistrict, policySummary }) {
           color       : '#7d6608',
           marginBottom: 16,
         }}>
-          Government scheme data (TNAU, PMKSY) is reference information compiled from training
-          knowledge as of early 2026. Verify against current government circulars before
+          Government scheme data (TNAU, PMKSY) is reference information compiled manually. Verify against current government circulars before
           use in official policy documents.
         </div>
 
