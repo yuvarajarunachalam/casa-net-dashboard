@@ -13,8 +13,8 @@ async function fetchCSV(url) {
   if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.status}`)
   const text = await response.text()
   const result = Papa.parse(text, {
-    header       : true,
-    dynamicTyping: true,
+    header        : true,
+    dynamicTyping : true,
     skipEmptyLines: true,
   })
   return result.data
@@ -38,6 +38,7 @@ export async function loadAllData() {
     modelMetrics,
     mergedAnnual,
     casaPredictions,
+    cropRecommendations,
     geojson,
   ] = await Promise.all([
     fetchCSV(DATA_FILES.policy_summary),
@@ -48,6 +49,7 @@ export async function loadAllData() {
     fetchCSV(DATA_FILES.model_metrics).catch(() => []),
     fetchCSV(DATA_FILES.merged_annual),
     fetchCSV(DATA_FILES.casa_predictions),
+    fetchCSV(DATA_FILES.crop_recommendations).catch(() => []),   // NEW
     fetchGeoJSON(DATA_FILES.geojson),
   ])
 
@@ -55,6 +57,34 @@ export async function loadAllData() {
   const byDistrict = {}
   for (const row of policySummary) {
     if (row.District) byDistrict[row.District] = row
+  }
+
+  // Build crop recommendation lookup — 1yr horizon, Samba season per district.
+  // crop_recommendations.csv has 6 rows per district (3 horizons × 2 seasons).
+  // We pick the Samba/1yr row as the primary recommendation for the district panel.
+  //
+  // Shape: { "Coimbatore": { Primary_Transition_Crop, Current_Rice_pct, Target_Rice_pct, ... } }
+  const cropRecByDistrict = {}
+  for (const row of cropRecommendations) {
+    if (!row.District) continue
+    const horizon = (row.Horizon || row.horizon || '').toString().toLowerCase()
+    const season  = (row.Season  || row.season  || '').toString().toLowerCase()
+    // Accept the first 1yr Samba row encountered per district
+    if (
+      (horizon.includes('1') || horizon === '1yr') &&
+      season.includes('samba') &&
+      !cropRecByDistrict[row.District]
+    ) {
+      cropRecByDistrict[row.District] = row
+    }
+  }
+  // Fallback: if Horizon/Season columns have different labels, take first row per district
+  if (Object.keys(cropRecByDistrict).length === 0) {
+    for (const row of cropRecommendations) {
+      if (row.District && !cropRecByDistrict[row.District]) {
+        cropRecByDistrict[row.District] = row
+      }
+    }
   }
 
   // Build historical GW series per district for the forecast chart
@@ -110,5 +140,6 @@ export async function loadAllData() {
     floodByDistrict,
     droughtByDistrict,
     shapByDistrict,
+    cropRecByDistrict,   // NEW — passed to DistrictPanel and PolicyPage
   }
 }

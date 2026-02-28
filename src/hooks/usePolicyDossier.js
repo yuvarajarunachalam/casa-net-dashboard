@@ -1,6 +1,6 @@
 // usePolicyDossier.js
 // Manages the full policy dossier generation for the Policy Analysis page.
-// All Gemini calls go through /api/policy-dossier (Vercel serverless function)
+// All Groq calls go through /api/policy-dossier (Vercel serverless function)
 // so the API key is never exposed in the browser.
 //
 // Four sections generated sequentially:
@@ -12,7 +12,7 @@
 // Rate limiting:
 //   Session cap: 10 full dossier generations per browser session
 //   Per-district cooldown: 60 seconds before same district can regenerate
-//   Sequential calls with 4.5s gap to respect Gemini free tier (15 RPM)
+//   Sequential calls with 4.5s gap to respect Groq free tier (15 RPM)
 //
 // Caching:
 //   Results cached in module-level object for the session lifetime
@@ -21,19 +21,26 @@ import { useState, useCallback, useRef } from 'react'
 import { getCropPolicy, getSchemesForDistrict } from '../data/tn_policy_reference'
 
 const SESSION_CAP  = 10
-const COOLDOWN_MS  = 60000  // 60 seconds between regenerations of same district
-const CALL_GAP_MS  = 4500   // gap between sequential Gemini calls
+const COOLDOWN_MS  = 60000   // 60 seconds between regenerations of same district
+const CALL_GAP_MS  = 4500    // gap between sequential Groq calls
 
 // Module-level — survives component remounts within the session
 const dossierCache  = {}
 const cooldownUntil = {}
 let   sessionCount  = 0
 
-async function callDossierAPI(section, districtData, cropPolicy, schemes, comparables) {
+async function callDossierAPI(section, districtData, cropPolicy, schemes, comparables, cropRecData) {
   const res = await fetch('/api/policy-dossier', {
     method : 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body   : JSON.stringify({ section, districtData, cropPolicy, schemes, comparables }),
+    body   : JSON.stringify({
+      section,
+      districtData,
+      cropPolicy,
+      schemes,
+      comparables,
+      cropRecData,   // NEW — crop area before/after + MSP revenue context
+    }),
   })
 
   if (!res.ok) throw new Error(`API ${res.status}`)
@@ -43,7 +50,7 @@ async function callDossierAPI(section, districtData, cropPolicy, schemes, compar
   return data.text
 }
 
-export function usePolicyDossier(allDistrictData, byDistrict) {
+export function usePolicyDossier(allDistrictData, byDistrict, cropRecByDistrict) {
   const [sections,    setSections]    = useState({})
   const [generating,  setGenerating]  = useState(false)
   const [progress,    setProgress]    = useState(0)
@@ -93,8 +100,6 @@ export function usePolicyDossier(allDistrictData, byDistrict) {
       return
     }
 
-    // Use byDistrict for direct lookup — already correctly keyed from the data loader
-    // This avoids name mismatch between GeoJSON dtname and CSV District column
     const districtData = (byDistrict && byDistrict[district])
       ? byDistrict[district]
       : allDistrictData?.find(r => r.District === district)
@@ -110,6 +115,8 @@ export function usePolicyDossier(allDistrictData, byDistrict) {
     const cropPolicy  = getCropPolicy(districtData.Recommended_Crop || 'Rice')
     const schemes     = getSchemesForDistrict(district)
     const comparables = findComparables(district, allDistrictData)
+    // Get crop area / MSP portfolio data for this district
+    const cropRecData = cropRecByDistrict?.[district] || null
 
     const STEPS = [
       { key: 'recommendation' },
@@ -126,7 +133,7 @@ export function usePolicyDossier(allDistrictData, byDistrict) {
       const { key } = STEPS[i]
       try {
         const text = await callDossierAPI(
-          key, districtData, cropPolicy, schemes, comparables
+          key, districtData, cropPolicy, schemes, comparables, cropRecData
         )
         result[key] = text
       } catch {
@@ -145,7 +152,7 @@ export function usePolicyDossier(allDistrictData, byDistrict) {
     cooldownUntil[district] = Date.now() + COOLDOWN_MS
     setGenerating(false)
     setProgress(4)
-  }, [allDistrictData])
+  }, [allDistrictData, cropRecByDistrict])
 
   return {
     sections,

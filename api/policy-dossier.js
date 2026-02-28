@@ -1,9 +1,7 @@
 // api/policy-dossier.js
 // Vercel serverless function for the Policy Analysis page.
-// Receives a section type and district data from the React app,
-// calls Groq server-side, and returns the generated text.
-// The API key is stored as GROQ_API_KEY in Vercel environment variables
-// and is never exposed to the browser.
+// Receives a section type and district data, calls Groq server-side,
+// returns the generated text.
 //
 // Section types:
 //   recommendation — why this crop switch/advisory/maintain decision
@@ -11,55 +9,117 @@
 //   contingency    — flood + drought risk across the full year
 //   comparable     — how this district compares to similar ones
 
-const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
+const GROQ_URL   = 'https://api.groq.com/openai/v1/chat/completions'
 const GROQ_MODEL = 'llama-3.1-8b-instant'
 
-function buildPromptRecommendation(d, cropPolicy, schemes) {
+const CROPS = ['Rice', 'Groundnut', 'Jowar', 'Bajra', 'Maize']
+
+// MSP 2023-24 (₹/quintal) — kept in sync with frontend config.js
+const MSP_2324 = {
+  Rice     : 2183,
+  Groundnut: 6377,
+  Jowar    : 3180,
+  Bajra    : 2500,
+  Maize    : 2090,
+}
+
+// Build "Rice 65.2%, Groundnut 20.1%..." string from a data row
+function formatCropMix(row, prefix) {
+  if (!row) return null
+  return CROPS
+    .map(c => {
+      const val = row[`${prefix}_${c}_pct`]
+      return val != null && Number(val) > 0.5
+        ? `${c} ${Number(val).toFixed(1)}%`
+        : null
+    })
+    .filter(Boolean)
+    .join(', ') || null
+}
+
+// Build a crop portfolio paragraph to inject into any prompt
+function cropPortfolioBlock(d, cropRecData) {
+  if (!cropRecData) return ''
+
+  const currentMix     = formatCropMix(cropRecData, 'Current')
+  const targetMix      = formatCropMix(cropRecData, 'Target')
+  const primaryCrop    = cropRecData.Primary_Transition_Crop   || d.Recommended_Crop
+  const secondaryCrop  = cropRecData.Secondary_Transition_Crop
+  const currentBurden  = cropRecData.Current_Water_Burden_Lkg
+  const targetBurden   = cropRecData.Target_Water_Burden_Lkg
+  const blendedSaving  = cropRecData.Blended_Water_Saving_pct
+
+  const lines = []
+  if (currentMix)  lines.push(`Current crop portfolio: ${currentMix}`)
+  if (targetMix)   lines.push(`Target crop portfolio:  ${targetMix}`)
+  if (primaryCrop) lines.push(`Primary transition crop: ${primaryCrop}`)
+  if (secondaryCrop && secondaryCrop !== 'None' && typeof secondaryCrop === 'string') {
+    lines.push(`Secondary transition crop: ${secondaryCrop}`)
+  }
+  if (currentBurden != null && targetBurden != null) {
+    lines.push(
+      `Water burden: ${Math.round(Number(currentBurden)).toLocaleString()} L/kg → ` +
+      `${Math.round(Number(targetBurden)).toLocaleString()} L/kg` +
+      (blendedSaving != null ? ` (${Number(blendedSaving).toFixed(1)}% blended saving)` : '')
+    )
+  }
+
+  // MSP revenue context for primary transition crop
+  const msp = MSP_2324[primaryCrop]
+  if (msp) {
+    lines.push(`${primaryCrop} MSP: ₹${msp.toLocaleString('en-IN')}/quintal (2023-24 CCEA rate)`)
+  }
+
+  return lines.length ? '\n\nCrop portfolio data:\n' + lines.join('\n') : ''
+}
+
+function buildPromptRecommendation(d, cropPolicy, schemes, cropRecData) {
   const schemeList = schemes.join(', ')
   return `You are a senior groundwater policy analyst advising the Tamil Nadu Agriculture Department.
 
 District: ${d.District}
-Urgency Tier: Tier ${d.Tier} — ${d.Tier_Label}
-Predicted GW depth (1yr): ${d.CASA_Pred_1yr}m below ground
-Predicted GW depth (5yr): ${d.CASA_Pred_5yr}m below ground
-Water table trend: ${d.GW_Trend_m_per_yr > 0 ? '+' : ''}${d.GW_Trend_m_per_yr}m per year
+Urgency Tier: Tier ${d.Tier} — ${d.Tier_Label || ''}
+Predicted GW depth (1yr): ${Number(d.CASA_Pred_1yr).toFixed(2)}m below ground
+Predicted GW depth (5yr): ${Number(d.CASA_Pred_5yr).toFixed(2)}m below ground
+Water table trend: ${Number(d.GW_Trend_m_per_yr) > 0 ? '+' : ''}${Number(d.GW_Trend_m_per_yr).toFixed(3)}m per year
 Groundwater dependency: ${Math.round((d.GW_Dep_Ratio || 0) * 100)}% pump-fed
 Recommendation type: ${d.Recommendation_Type}
 Recommended crop: ${d.Recommended_Crop}
-Current dominant crop: ${d.Rec_Crop_Original || d.Recommended_Crop}
-Water saving potential: ${d.Potential_Water_Saving_pct}%
+Water saving potential: ${Number(d.Potential_Water_Saving_pct).toFixed(1)}%
 Primary model driver (SHAP): ${d.SHAP_Top_Driver_Label || 'long-term depletion trend'}
 Government scheme eligibility: ${schemeList}
 TNAU crop guidance: ${cropPolicy.tnau_recommendation || ''}
 PMKSY eligibility: ${cropPolicy.pmksy_note || ''}
 Market context: ${cropPolicy.market_note || ''}
-Implementation challenges: ${cropPolicy.challenges || ''}
+Implementation challenges: ${cropPolicy.challenges || ''}${cropPortfolioBlock(d, cropRecData)}
 
 Write 3-4 sentences explaining WHY this specific recommendation was made for ${d.District}.
-Reference the actual depth numbers, trend, and GW dependency.
+Reference the actual GW depth, trend, and crop portfolio shift — cite specific before/after percentages.
+Mention the MSP revenue opportunity to motivate farmer adoption.
 Mention which government schemes support this transition.
 Be specific to Tamil Nadu agricultural context — avoid generic advice.
 Write in plain English suitable for a district agricultural officer.
 No headings, no bullet points, no preamble.`
 }
 
-function buildPromptFeasibility(d, cropPolicy) {
+function buildPromptFeasibility(d, cropPolicy, cropRecData) {
   return `You are a senior groundwater policy analyst advising the Tamil Nadu Agriculture Department.
 
 District: ${d.District}
 Feasibility score: ${d.Feasibility_Score}/100 — ${d.Feasibility_Label}
 Recommendation type: ${d.Recommendation_Type}
 Recommended crop: ${d.Recommended_Crop}
-Water saving potential: ${d.Potential_Water_Saving_pct}%
+Water saving potential: ${Number(d.Potential_Water_Saving_pct).toFixed(1)}%
 GW dependency: ${Math.round((d.GW_Dep_Ratio || 0) * 100)}%
 Canal dependency: ${Math.round((d.Canal_Dep_Ratio || 0) * 100)}%
-GW trend: ${d.GW_Trend_m_per_yr > 0 ? '+' : ''}${d.GW_Trend_m_per_yr}m per year
+GW trend: ${Number(d.GW_Trend_m_per_yr) > 0 ? '+' : ''}${Number(d.GW_Trend_m_per_yr).toFixed(3)}m per year
 Crop market context: ${cropPolicy.market_note || ''}
 Crop challenges: ${cropPolicy.challenges || ''}
-Water saving context: ${cropPolicy.water_saving_note || ''}
+Water saving context: ${cropPolicy.water_saving_note || ''}${cropPortfolioBlock(d, cropRecData)}
 
 Write 3-4 sentences analysing the feasibility score for ${d.District}.
 Explain specifically what is helping or hurting feasibility.
+Reference the crop portfolio shift scale — a large portfolio change is harder to execute than a small one.
 If feasibility is Low or Medium, identify the one main barrier and suggest how to address it.
 Be specific to Tamil Nadu agricultural and infrastructure context.
 No headings, no bullet points, no preamble.`
@@ -69,7 +129,7 @@ function buildPromptContingency(d) {
   return `You are a senior groundwater policy analyst advising the Tamil Nadu Agriculture Department.
 
 District: ${d.District}
-GW depth: ${d.CASA_Pred_1yr}m
+GW depth: ${Number(d.CASA_Pred_1yr).toFixed(2)}m
 GW dependency: ${Math.round((d.GW_Dep_Ratio || 0) * 100)}%
 Flood risk: ${d.Flood_Risk}
 Drought risk: ${d.Drought_Risk}
@@ -87,14 +147,14 @@ No headings, no bullet points, no preamble.`
 
 function buildPromptComparable(d, comparables) {
   const compText = comparables.map(c =>
-    `${c.District}: depth ${c.CASA_Pred_1yr}m, ${Math.round((c.GW_Dep_Ratio||0)*100)}% GW dep, ` +
+    `${c.District}: depth ${Number(c.CASA_Pred_1yr).toFixed(2)}m, ${Math.round((c.GW_Dep_Ratio||0)*100)}% GW dep, ` +
     `Tier ${c.Tier}, feasibility ${c.Feasibility_Score}, rec: ${c.Recommended_Crop} (${c.Recommendation_Type})`
   ).join('\n')
 
   return `You are a senior groundwater policy analyst advising the Tamil Nadu Agriculture Department.
 
 District being analysed: ${d.District}
-Depth: ${d.CASA_Pred_1yr}m, GW dep: ${Math.round((d.GW_Dep_Ratio||0)*100)}%, Tier ${d.Tier}, feasibility: ${d.Feasibility_Score}
+Depth: ${Number(d.CASA_Pred_1yr).toFixed(2)}m, GW dep: ${Math.round((d.GW_Dep_Ratio||0)*100)}%, Tier ${d.Tier}, feasibility: ${d.Feasibility_Score}
 
 Comparable districts facing similar groundwater stress:
 ${compText || 'No comparable districts found in this depth and dependency range.'}
@@ -106,10 +166,10 @@ Be specific — reference actual numbers from the comparable districts.
 No headings, no bullet points, no preamble.`
 }
 
-function buildPrompt(section, districtData, cropPolicy, schemes, comparables) {
+function buildPrompt(section, districtData, cropPolicy, schemes, comparables, cropRecData) {
   switch (section) {
-    case 'recommendation': return buildPromptRecommendation(districtData, cropPolicy, schemes)
-    case 'feasibility':    return buildPromptFeasibility(districtData, cropPolicy)
+    case 'recommendation': return buildPromptRecommendation(districtData, cropPolicy, schemes, cropRecData)
+    case 'feasibility':    return buildPromptFeasibility(districtData, cropPolicy, cropRecData)
     case 'contingency':    return buildPromptContingency(districtData)
     case 'comparable':     return buildPromptComparable(districtData, comparables)
     default: throw new Error(`Unknown section: ${section}`)
@@ -121,7 +181,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { section, districtData, cropPolicy, schemes, comparables } = req.body
+  const { section, districtData, cropPolicy, schemes, comparables, cropRecData } = req.body
 
   if (!section || !districtData) {
     return res.status(400).json({ error: 'Missing section or districtData' })
@@ -138,7 +198,11 @@ export default async function handler(req, res) {
 
   let prompt
   try {
-    prompt = buildPrompt(section, districtData, cropPolicy || {}, schemes || [], comparables || [])
+    prompt = buildPrompt(
+      section, districtData,
+      cropPolicy || {}, schemes || [],
+      comparables || [], cropRecData || null
+    )
   } catch (err) {
     return res.status(400).json({ error: err.message })
   }
@@ -148,12 +212,12 @@ export default async function handler(req, res) {
       method : 'POST',
       headers: {
         'Content-Type' : 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model      : GROQ_MODEL,
         messages   : [{ role: 'user', content: prompt }],
-        max_tokens : 200,
+        max_tokens : 220,
         temperature: 0.3,
       }),
     })

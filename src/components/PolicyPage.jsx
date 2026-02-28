@@ -86,7 +86,7 @@ function SchemeBadge({ scheme }) {
   )
 }
 
-export default function PolicyPage({ geojson, byDistrict, policySummary }) {
+export default function PolicyPage({ geojson, byDistrict, policySummary, cropRecByDistrict }) {
   const [selectedDistrict, setSelectedDistrict] = useState(null)
   const districtData = selectedDistrict ? byDistrict[selectedDistrict] : null
 
@@ -94,7 +94,7 @@ export default function PolicyPage({ geojson, byDistrict, policySummary }) {
     sections, generating, progress, cooldown,
     sessionFull, sessionCount, SESSION_CAP,
     generate, findComparables,
-  } = usePolicyDossier(policySummary, byDistrict)
+  } = usePolicyDossier(policySummary, byDistrict, cropRecByDistrict)
 
   // Auto-generate when district is selected
   useEffect(() => {

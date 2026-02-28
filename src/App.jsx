@@ -3,7 +3,6 @@ import { loadAllData } from './utils/dataLoader'
 import Header from './components/Header'
 import MapView from './components/MapView'
 import DistrictPanel from './components/DistrictPanel'
-import AIInsightsPanel from './components/AIInsightsPanel'
 import PriorityTable from './components/PriorityTable'
 import ScenarioPlanner from './components/ScenarioPlanner'
 import ModelView from './components/ModelView'
@@ -15,6 +14,8 @@ export default function App() {
   const [error,            setError]            = useState(null)
   const [activeTab,        setActiveTab]        = useState('map')
   const [selectedDistrict, setSelectedDistrict] = useState(null)
+  // Mobile: controls whether the district panel drawer is open
+  const [panelOpen,        setPanelOpen]        = useState(false)
 
   // Load all CSV and GeoJSON data once on mount
   useEffect(() => {
@@ -28,6 +29,13 @@ export default function App() {
   const handleSelectDistrict = useCallback((district) => {
     setSelectedDistrict(district)
     setActiveTab('map')
+    setPanelOpen(true)
+  }, [])
+
+  // Clicking a district on the map opens the panel
+  const handleMapSelect = useCallback((district) => {
+    setSelectedDistrict(district)
+    setPanelOpen(true)
   }, [])
 
   // Navigate directly to Policy Analysis for a given district
@@ -65,6 +73,7 @@ export default function App() {
   }
 
   const districtData = selectedDistrict ? data.byDistrict[selectedDistrict] : null
+  const cropRecData  = selectedDistrict ? data.cropRecByDistrict?.[selectedDistrict] : null
 
   return (
     <>
@@ -72,25 +81,32 @@ export default function App() {
 
       <main className="main-layout">
 
-        {/* Map tab — full-width map with district panel and AI insights sidebar */}
+        {/* Map tab — map with district panel sidebar */}
         {activeTab === 'map' && (
           <>
             <MapView
               geojson={data.geojson}
               byDistrict={data.byDistrict}
               selectedDistrict={selectedDistrict}
-              onSelectDistrict={setSelectedDistrict}
+              onSelectDistrict={handleMapSelect}
             />
+
+            {/* Mobile panel overlay backdrop */}
+            {panelOpen && selectedDistrict && (
+              <div
+                className="panel-backdrop"
+                onClick={() => setPanelOpen(false)}
+              />
+            )}
+
             <DistrictPanel
               district={selectedDistrict}
               districtData={districtData}
+              cropRecData={cropRecData}
               gwHistory={data.gwHistory}
               onOpenPolicy={handleOpenPolicy}
-            />
-            <AIInsightsPanel
-              policySummary={data.policySummary}
-              onSelectDistrict={handleSelectDistrict}
-              selectedDistrict={selectedDistrict}
+              panelOpen={panelOpen}
+              onClose={() => setPanelOpen(false)}
             />
           </>
         )}
@@ -123,6 +139,7 @@ export default function App() {
             geojson={data.geojson}
             byDistrict={data.byDistrict}
             policySummary={data.policySummary}
+            cropRecByDistrict={data.cropRecByDistrict}
           />
         )}
 

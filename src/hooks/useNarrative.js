@@ -3,86 +3,93 @@
 //
 // Environment routing:
 //   Development (npm run dev):
-//     Calls Gemini 2.0 Flash directly from the browser using VITE_GEMINI_API_KEY
-//     from your .env.local file. The key is exposed to the browser in dev only —
-//     this is acceptable for local use and review demos.
+//     Calls Groq directly from the browser using VITE_GROQ_API_KEY from .env.local.
 //
 //   Production (Vercel):
-//     Calls /api/narrative (the serverless function in api/narrative.js) which
-//     reads GEMINI_API_KEY from Vercel environment variables server-side.
+//     Calls /api/narrative (serverless function) which reads GROQ_API_KEY server-side.
 //     The key is never exposed to the browser in production.
 //
-// Fallback chain (same in both environments):
-//   1. Gemini 2.0 Flash response
-//   2. Precomputed Policy_Narrative from Script 8 CSV
-//
-// Results are cached in memory for the session — same district is never
-// fetched twice without a page reload.
+// Payload now includes crop area distribution (before/after) and MSP revenue context
+// so the Groq prompt can reference specific portfolio numbers in the brief.
 
 import { useState, useCallback, useRef } from 'react'
 
 const cache = {}
 
-const GEMINI_ENDPOINT =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+const CROPS = ['Rice', 'Groundnut', 'Jowar', 'Bajra', 'Maize']
 
-// Build the prompt sent to Gemini.
-// Kept tight and directive — the model should not invent context beyond
-// what the district data provides.
-function buildPrompt(d) {
-  return `You are a groundwater policy analyst advising the Tamil Nadu state government.
-Using only the data below, write a 3-sentence policy brief (maximum 80 words) that:
-1. States the core groundwater problem with specific numbers
-2. Identifies the primary driver from the SHAP analysis
-3. Gives one clear, specific actionable recommendation
-
-District: ${d.district}
-Predicted GW depth (next year): ${d.depth}m below ground
-Water table trend: ${d.trend > 0 ? '+' : ''}${d.trend}m per year
-Urgency tier: Tier ${d.tier} of 4
-Pump-fed irrigation dependency: ${Math.round(d.gw_dependency * 100)}%
-Recommended crop transition: ${d.recommended_crop}
-Potential water saving from transition: ${d.water_saving}%
-Primary model driver (SHAP): ${d.shap_top_driver}
-Flood risk level: ${d.flood_risk}
-Drought risk level: ${d.drought_risk}
-
-Write only the brief. No headings, no bullet points, no preamble.`
+// MSP 2023-24 values (₹/quintal) — kept in sync with config.js
+const MSP_2324 = {
+  Rice     : 2183,
+  Groundnut: 6377,
+  Jowar    : 3180,
+  Bajra    : 2500,
+  Maize    : 2090,
 }
 
-// Call Gemini directly from the browser (development only)
-async function callGeminiBrowser(districtData) {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY
-  if (!apiKey) return null
+// Format crop portfolio as a readable string for the prompt
+// e.g. "Rice 65.2%, Groundnut 20.1%, Jowar 8.5%, Bajra 4.2%, Maize 2.0%"
+function formatCropMix(rec, prefix) {
+  if (!rec) return null
+  return CROPS
+    .map(c => {
+      const val = rec[`${prefix}_${c}_pct`]
+      return val != null && val > 0.5 ? `${c} ${Number(val).toFixed(1)}%` : null
+    })
+    .filter(Boolean)
+    .join(', ') || null
+}
 
-  const response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
-    method : 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body   : JSON.stringify({
-      contents         : [{ parts: [{ text: buildPrompt(districtData) }] }],
-      generationConfig : { maxOutputTokens: 160, temperature: 0.3 },
-    }),
-  })
+// Build the enriched payload sent to /api/narrative
+export function buildNarrativePayload(districtRow, cropRecData) {
+  const currentMix = formatCropMix(cropRecData, 'Current')
+  const targetMix  = formatCropMix(cropRecData, 'Target')
 
-  if (!response.ok) throw new Error(`Gemini ${response.status}`)
+  // MSP revenue context for the recommended crop
+  const recCrop    = districtRow.Recommended_Crop
+  const mspVal     = MSP_2324[recCrop]
+  const mspContext = mspVal
+    ? `${recCrop} MSP ₹${mspVal.toLocaleString('en-IN')}/quintal (2023-24)`
+    : null
 
-  const data = await response.json()
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
-  if (!text) throw new Error('Empty Gemini response')
-  return text
+  // Water burden before/after from crop_recommendations.csv
+  const currentBurden = cropRecData?.Current_Water_Burden_Lkg
+  const targetBurden  = cropRecData?.Target_Water_Burden_Lkg
+
+  return {
+    district          : districtRow.District,
+    depth             : districtRow.CASA_Pred_1yr,
+    trend             : districtRow.GW_Trend_m_per_yr || 0,
+    tier              : districtRow.Tier,
+    recommended_crop  : recCrop,
+    water_saving      : districtRow.Potential_Water_Saving_pct,
+    gw_dependency     : districtRow.GW_Dep_Ratio || 0,
+    shap_top_driver   : districtRow.SHAP_Top_Driver_Label || 'long-term depletion trend',
+    flood_risk        : districtRow.Flood_Risk,
+    drought_risk      : districtRow.Drought_Risk,
+    fallback_narrative: districtRow.Policy_Narrative,
+    // Crop portfolio enrichment
+    current_crop_mix  : currentMix,
+    target_crop_mix   : targetMix,
+    primary_crop      : cropRecData?.Primary_Transition_Crop   || recCrop,
+    secondary_crop    : cropRecData?.Secondary_Transition_Crop || null,
+    current_burden_lkg: currentBurden,
+    target_burden_lkg : targetBurden,
+    msp_context       : mspContext,
+  }
 }
 
 // Call the Vercel serverless function (production)
-async function callVercelFunction(districtData) {
+async function callVercelFunction(payload) {
   const response = await fetch('/api/narrative', {
     method : 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body   : JSON.stringify(districtData),
+    body   : JSON.stringify(payload),
   })
   if (!response.ok) throw new Error(`API ${response.status}`)
   const data = await response.json()
   if (!data.narrative) throw new Error('Empty API response')
-  return data.narrative
+  return { narrative: data.narrative, source: data.source || 'groq' }
 }
 
 export function useNarrative() {
@@ -91,7 +98,7 @@ export function useNarrative() {
   const [source,    setSource]    = useState(null)
   const currentKey                = useRef(null)
 
-  const fetchNarrative = useCallback(async (districtRow) => {
+  const fetchNarrative = useCallback(async (districtRow, cropRecData) => {
     const key = districtRow?.District
     if (!key) return
 
@@ -107,38 +114,17 @@ export function useNarrative() {
     setNarrative(null)
     setSource(null)
 
-    // Normalise the district row into the shape both callers expect
-    const payload = {
-      district          : districtRow.District,
-      depth             : districtRow.CASA_Pred_1yr,
-      trend             : districtRow.GW_Trend_m_per_yr || 0,
-      tier              : districtRow.Tier,
-      recommended_crop  : districtRow.Recommended_Crop,
-      water_saving      : districtRow.Potential_Water_Saving_pct,
-      gw_dependency     : districtRow.GW_Dep_Ratio || 0,
-      shap_top_driver   : districtRow.SHAP_Top_Driver_Label || 'long-term depletion trend',
-      flood_risk        : districtRow.Flood_Risk,
-      drought_risk      : districtRow.Drought_Risk,
-      fallback_narrative: districtRow.Policy_Narrative,
-    }
+    const payload = buildNarrativePayload(districtRow, cropRecData)
 
     let text   = null
     let srcTag = 'precomputed'
 
     try {
-      // In development, VITE_GEMINI_API_KEY is available → call browser-side
-      // In production, that env var is not set → call Vercel function
-      const isDev = import.meta.env.DEV && import.meta.env.VITE_GEMINI_API_KEY
-
-      if (isDev) {
-        text   = await callGeminiBrowser(payload)
-        srcTag = 'gemini'
-      } else {
-        text   = await callVercelFunction(payload)
-        srcTag = 'gemini'
-      }
+      const result = await callVercelFunction(payload)
+      text   = result.narrative
+      srcTag = result.source
     } catch {
-      // Both paths failed — use precomputed text from Script 8
+      // Vercel function failed — use precomputed text from Script 8
       text   = payload.fallback_narrative || 'No narrative available.'
       srcTag = 'precomputed'
     }

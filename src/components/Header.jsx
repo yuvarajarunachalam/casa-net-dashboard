@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 const TABS = [
   { id: 'map',        label: 'Overview Map' },
@@ -9,23 +9,58 @@ const TABS = [
 ]
 
 export default function Header({ activeTab, onTabChange }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const handleTab = (id) => {
+    onTabChange(id)
+    setMenuOpen(false)
+  }
+
   return (
     <header className="header">
       <div className="header-title">
         <h1>CASA-Net</h1>
-        <span>Tamil Nadu Groundwater Policy Dashboard</span>
+        <span className="header-subtitle">Tamil Nadu Groundwater Policy Dashboard</span>
       </div>
+
+      {/* Desktop nav */}
       <nav className="header-nav">
         {TABS.map(tab => (
           <button
             key={tab.id}
             className={`nav-btn ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => onTabChange(tab.id)}
+            onClick={() => handleTab(tab.id)}
           >
             {tab.label}
           </button>
         ))}
       </nav>
+
+      {/* Mobile hamburger button */}
+      <button
+        className="hamburger-btn"
+        onClick={() => setMenuOpen(o => !o)}
+        aria-label="Toggle menu"
+      >
+        <span className={`hamburger-icon ${menuOpen ? 'open' : ''}`}>
+          <span /><span /><span />
+        </span>
+      </button>
+
+      {/* Mobile dropdown menu */}
+      {menuOpen && (
+        <div className="mobile-nav">
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              className={`mobile-nav-btn ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => handleTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
     </header>
   )
 }
