@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { TIER_LABELS, TIER_COLORS, DATA_FILES, WATERFALL_DISTRICTS } from '../config'
+import { TIER_LABELS, TIER_COLORS } from '../config'
 import { riskColor } from '../utils/colors'
 import { useNarrative } from '../hooks/useNarrative'
 import GWChart from './GWChart'
@@ -372,19 +372,6 @@ export default function DistrictPanel({
             </div>
           </div>
         </div>
-
-        {/* SHAP waterfall — only for 5 focal districts */}
-        {WATERFALL_DISTRICTS.includes(district) && (
-          <div>
-            <div className="section-title">SHAP Feature Contributions</div>
-            <img
-              src={`${DATA_FILES.shap_beeswarm.replace('shap_summary_beeswarm.png', '')}shap_waterfall_${district.replace(' ', '_')}.png`}
-              alt={`SHAP waterfall for ${district}`}
-              style={{ width: '100%', borderRadius: 6, border: '1px solid #dde3ea' }}
-              onError={e => e.target.style.display = 'none'}
-            />
-          </div>
-        )}
 
         {/* AI Policy Narrative */}
         <div>
