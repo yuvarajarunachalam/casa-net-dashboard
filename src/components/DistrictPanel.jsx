@@ -375,17 +375,12 @@ export default function DistrictPanel({
 
         {/* AI Policy Narrative */}
         <div>
-          <div className="section-title">AI Policy Brief</div>
+          <div className="section-title">Policy Brief</div>
           <div className="ai-narrative">
             {loading ? (
               <div className="ai-loading">Generating analysis...</div>
             ) : (
               <p className="ai-narrative-text">{narrative}</p>
-            )}
-            {source && !loading && (
-              <div className="ai-source-badge">
-                {source === 'groq' || source === 'gemini' ? 'Groq · llama-3.1-8b' : 'Precomputed (Script 8)'}
-              </div>
             )}
           </div>
         </div>

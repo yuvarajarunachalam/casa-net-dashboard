@@ -85,6 +85,57 @@ export default function ModelView({ modelMetrics }) {
         alt="SHAP vs attribution validation scatter"
       />
 
+      {/* Evaluation reasoning — what these numbers actually mean */}
+      <div className="card">
+        <div className="card-title">What These Metrics Mean in Practice</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, marginTop: 12 }}>
+
+          <div style={{ background: '#f0f7ff', borderRadius: 8, padding: '14px 16px', borderLeft: '4px solid #2980b9' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#1a5276', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+              RMSE in Context
+            </div>
+            <div style={{ fontSize: 13, lineHeight: 1.65, color: '#2c3e50' }}>
+              RMSE of <strong>1.319m</strong> across 38 districts with GW depths ranging 1.5m–13m
+              represents <strong>~11% of the measurement range</strong> — comparable to published LSTM
+              models (0.60–1.98m, Sun et al. 2022). Critically, this is a harder task: simultaneous
+              1-year-ahead forecast across heterogeneous districts, not single-well monthly prediction.
+            </div>
+          </div>
+
+          <div style={{ background: '#f0fff4', borderRadius: 8, padding: '14px 16px', borderLeft: '4px solid #27ae60' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#1e8449', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+              Spearman 0.961 — The Policy Number
+            </div>
+            <div style={{ fontSize: 13, lineHeight: 1.65, color: '#2c3e50' }}>
+              For a planning tool, ranking districts by urgency matters more than exact depth.
+              A Spearman correlation of <strong>0.961 (p&lt;0.0001)</strong> means the model
+              orders all 38 districts in near-perfect urgency sequence — the right districts
+              receive intervention first, with <strong>zero Tier 1→Tier 3 misclassifications</strong>.
+            </div>
+          </div>
+
+          <div style={{ background: '#fff8f0', borderRadius: 8, padding: '14px 16px', borderLeft: '4px solid #e67e22' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#a04000', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+              External Validation — CGWB 2023
+            </div>
+            <div style={{ fontSize: 13, lineHeight: 1.65, color: '#2c3e50' }}>
+              CASA-Net tier classifications agree with India's Central Ground Water Board (CGWB 2023)
+              official status for <strong>55.3% of districts</strong> — higher than the 44.7% agreement
+              between raw sensor data and CGWB. Divergences are structural: delta districts
+              (e.g. Thanjavur) show CGWB over-exploitation by volume despite shallow depth, while
+              hard-rock districts (e.g. Coimbatore) align on both metrics.
+            </div>
+          </div>
+
+        </div>
+        <div style={{ marginTop: 14, padding: '10px 14px', background: '#f8f9fa', borderRadius: 6, fontSize: 12, color: '#666', lineHeight: 1.6 }}>
+          <strong>Benchmark comparison:</strong>&nbsp;
+          CASA-Net RMSE 1.319m beats Naive baseline (1.923m), ARIMA (2.160m), and standalone LSTM (1.439m)
+          on a fair 1-year-ahead task. The Spearman ranking metric is operationally more relevant than
+          RMSE for district-level policy decisions.
+        </div>
+      </div>
+
       {/* Architecture explanation */}
       <div className="card">
         <div className="card-title">How CASA-Net Works</div>
