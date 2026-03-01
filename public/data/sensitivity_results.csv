@@ -1,0 +1,16 @@
+District,Year,Scenario,From_Crop,To_Crop,Shift_Pct,Baseline_m,Intervened_m,Delta_m,Burden_Delta,Correct_Dir
+Coimbatore,2022,Rice→Groundnut 10%,Rice,Groundnut,10.0,13.175,13.283,0.109,-6.0,False
+Coimbatore,2022,Rice→Groundnut 20%,Rice,Groundnut,20.0,13.175,13.36,0.186,-11.0,False
+Coimbatore,2022,Rice→Jowar 20%,Rice,Jowar,20.0,13.175,13.327,0.152,-13.0,False
+Namakkal,2022,Rice→Groundnut 10%,Rice,Groundnut,10.0,10.483,10.742,0.259,-13.0,False
+Namakkal,2022,Rice→Groundnut 20%,Rice,Groundnut,20.0,10.483,10.954,0.471,-26.0,False
+Namakkal,2022,Rice→Jowar 20%,Rice,Jowar,20.0,10.483,10.941,0.458,-31.0,False
+Salem,2022,Rice→Groundnut 10%,Rice,Groundnut,10.0,8.405,8.931,0.526,-24.0,False
+Salem,2022,Rice→Groundnut 20%,Rice,Groundnut,20.0,8.405,9.668,1.263,-48.0,False
+Salem,2022,Rice→Jowar 20%,Rice,Jowar,20.0,8.405,9.416,1.011,-58.0,False
+Dharmapuri,2022,Rice→Groundnut 10%,Rice,Groundnut,10.0,9.179,10.998,1.82,-53.0,False
+Dharmapuri,2022,Rice→Groundnut 20%,Rice,Groundnut,20.0,9.179,12.148,2.969,-107.0,False
+Dharmapuri,2022,Rice→Jowar 20%,Rice,Jowar,20.0,9.179,12.096,2.917,-128.0,False
+Tiruppur,2022,Rice→Groundnut 10%,Rice,Groundnut,10.0,9.487,9.765,0.278,-22.0,False
+Tiruppur,2022,Rice→Groundnut 20%,Rice,Groundnut,20.0,9.487,10.078,0.591,-43.0,False
+Tiruppur,2022,Rice→Jowar 20%,Rice,Jowar,20.0,9.487,9.969,0.482,-52.0,False
