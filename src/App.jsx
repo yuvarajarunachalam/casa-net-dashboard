@@ -84,12 +84,14 @@ export default function App() {
         {/* Map tab — map with district panel sidebar */}
         {activeTab === 'map' && (
           <>
-            <MapView
-              geojson={data.geojson}
-              byDistrict={data.byDistrict}
-              selectedDistrict={selectedDistrict}
-              onSelectDistrict={handleMapSelect}
-            />
+            <div className={`map-wrapper${panelOpen && selectedDistrict ? ' map-panel-open' : ''}`}>
+              <MapView
+                geojson={data.geojson}
+                byDistrict={data.byDistrict}
+                selectedDistrict={selectedDistrict}
+                onSelectDistrict={handleMapSelect}
+              />
+            </div>
 
             {/* Mobile panel overlay backdrop */}
             {panelOpen && selectedDistrict && (
