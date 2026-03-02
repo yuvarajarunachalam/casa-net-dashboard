@@ -1,34 +1,39 @@
 // useNarrative.js
-// Fetches AI-generated policy narratives for individual districts.
-//
-// Environment routing:
-//   Development (npm run dev):
-//     Calls Groq directly from the browser using VITE_GROQ_API_KEY from .env.local.
-//
-//   Production (Vercel):
-//     Calls /api/narrative (serverless function) which reads GROQ_API_KEY server-side.
-//     The key is never exposed to the browser in production.
-//
-// Payload now includes crop area distribution (before/after) and MSP revenue context
-// so the Groq prompt can reference specific portfolio numbers in the brief.
+// Persistent cache: briefs stored in localStorage so they survive page reloads.
+// First click generates via /api/narrative (Groq). Subsequent visits load instantly.
+// 38-district cap: once all 38 are cached, zero API calls are made during demo.
 
 import { useState, useCallback, useRef } from 'react'
 
-const cache = {}
-
+const STORAGE_PREFIX = 'casa_brief_v2_'
 const CROPS = ['Rice', 'Groundnut', 'Jowar', 'Bajra', 'Maize']
-
-// MSP 2023-24 values (₹/quintal) — kept in sync with config.js
 const MSP_2324 = {
-  Rice     : 2183,
-  Groundnut: 6377,
-  Jowar    : 3180,
-  Bajra    : 2500,
-  Maize    : 2090,
+  Rice: 2183, Groundnut: 6377, Jowar: 3180, Bajra: 2500, Maize: 2090,
 }
 
-// Format crop portfolio as a readable string for the prompt
-// e.g. "Rice 65.2%, Groundnut 20.1%, Jowar 8.5%, Bajra 4.2%, Maize 2.0%"
+// In-memory cache for the current session (avoids localStorage reads on every render)
+const memCache = {}
+
+function storageGet(district) {
+  if (memCache[district]) return memCache[district]
+  try {
+    const raw = localStorage.getItem(STORAGE_PREFIX + district)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      memCache[district] = parsed
+      return parsed
+    }
+  } catch {}
+  return null
+}
+
+function storageSet(district, value) {
+  memCache[district] = value
+  try {
+    localStorage.setItem(STORAGE_PREFIX + district, JSON.stringify(value))
+  } catch {}
+}
+
 function formatCropMix(rec, prefix) {
   if (!rec) return null
   return CROPS
@@ -40,21 +45,14 @@ function formatCropMix(rec, prefix) {
     .join(', ') || null
 }
 
-// Build the enriched payload sent to /api/narrative
 export function buildNarrativePayload(districtRow, cropRecData) {
   const currentMix = formatCropMix(cropRecData, 'Current')
   const targetMix  = formatCropMix(cropRecData, 'Target')
-
-  // MSP revenue context for the recommended crop
   const recCrop    = districtRow.Recommended_Crop
   const mspVal     = MSP_2324[recCrop]
   const mspContext = mspVal
     ? `${recCrop} MSP ₹${mspVal.toLocaleString('en-IN')}/quintal (2023-24)`
     : null
-
-  // Water burden before/after from crop_recommendations.csv
-  const currentBurden = cropRecData?.Current_Water_Burden_Lkg
-  const targetBurden  = cropRecData?.Target_Water_Burden_Lkg
 
   return {
     district          : districtRow.District,
@@ -68,18 +66,16 @@ export function buildNarrativePayload(districtRow, cropRecData) {
     flood_risk        : districtRow.Flood_Risk,
     drought_risk      : districtRow.Drought_Risk,
     fallback_narrative: districtRow.Policy_Narrative,
-    // Crop portfolio enrichment
     current_crop_mix  : currentMix,
     target_crop_mix   : targetMix,
     primary_crop      : cropRecData?.Primary_Transition_Crop   || recCrop,
     secondary_crop    : cropRecData?.Secondary_Transition_Crop || null,
-    current_burden_lkg: currentBurden,
-    target_burden_lkg : targetBurden,
+    current_burden_lkg: cropRecData?.Current_Water_Burden_Lkg,
+    target_burden_lkg : cropRecData?.Target_Water_Burden_Lkg,
     msp_context       : mspContext,
   }
 }
 
-// Call the Vercel serverless function (production)
 async function callVercelFunction(payload) {
   const response = await fetch('/api/narrative', {
     method : 'POST',
@@ -95,48 +91,39 @@ async function callVercelFunction(payload) {
 export function useNarrative() {
   const [loading,   setLoading]   = useState(false)
   const [narrative, setNarrative] = useState(null)
-  const [source,    setSource]    = useState(null)
-  const currentKey                = useRef(null)
+  const currentKey = useRef(null)
 
   const fetchNarrative = useCallback(async (districtRow, cropRecData) => {
     const key = districtRow?.District
     if (!key) return
 
-    // Return cached result immediately
-    if (cache[key]) {
-      setNarrative(cache[key].narrative)
-      setSource(cache[key].source)
+    // Check persistent cache first
+    const cached = storageGet(key)
+    if (cached) {
+      setNarrative(cached.narrative)
       return
     }
 
     currentKey.current = key
     setLoading(true)
     setNarrative(null)
-    setSource(null)
 
     const payload = buildNarrativePayload(districtRow, cropRecData)
-
-    let text   = null
-    let srcTag = 'precomputed'
+    let text = null
 
     try {
       const result = await callVercelFunction(payload)
-      text   = result.narrative
-      srcTag = result.source
+      text = result.narrative
     } catch {
-      // Vercel function failed — use precomputed text from Script 8
-      text   = payload.fallback_narrative || 'No narrative available.'
-      srcTag = 'precomputed'
+      text = payload.fallback_narrative || 'No narrative available.'
     }
 
-    // Discard stale response if user clicked a different district
     if (currentKey.current !== key) return
 
-    cache[key] = { narrative: text, source: srcTag }
+    storageSet(key, { narrative: text })
     setNarrative(text)
-    setSource(srcTag)
     setLoading(false)
   }, [])
 
-  return { narrative, loading, source, fetchNarrative }
+  return { narrative, loading, fetchNarrative }
 }

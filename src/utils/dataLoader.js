@@ -40,6 +40,8 @@ export async function loadAllData() {
     casaPredictions,
     cropRecommendations,
     geojson,
+    seasonalCalendar,
+    monthlyPredictions,
   ] = await Promise.all([
     fetchCSV(DATA_FILES.policy_summary),
     fetchCSV(DATA_FILES.district_tiers),
@@ -49,8 +51,10 @@ export async function loadAllData() {
     fetchCSV(DATA_FILES.model_metrics).catch(() => []),
     fetchCSV(DATA_FILES.merged_annual),
     fetchCSV(DATA_FILES.casa_predictions),
-    fetchCSV(DATA_FILES.crop_recommendations).catch(() => []),   // NEW
+    fetchCSV(DATA_FILES.crop_recommendations).catch(() => []),
     fetchGeoJSON(DATA_FILES.geojson),
+    fetchCSV(DATA_FILES.seasonal_calendar).catch(() => []),
+    fetchCSV(DATA_FILES.monthly_predictions).catch(() => []),
   ])
 
   // Build a fast lookup dictionary by district name
@@ -130,6 +134,20 @@ export async function loadAllData() {
     shapByDistrict[row.District] = row
   }
 
+  // Build seasonal calendar lookup by district
+  const seasonalByDistrict = {}
+  for (const row of seasonalCalendar) {
+    if (row.District) seasonalByDistrict[row.District] = row
+  }
+
+  // Build monthly predictions lookup: { District: [{Month, Pred_1m, GW_Actual, ...}] }
+  const monthlyByDistrict = {}
+  for (const row of monthlyPredictions) {
+    if (!row.District) continue
+    if (!monthlyByDistrict[row.District]) monthlyByDistrict[row.District] = []
+    monthlyByDistrict[row.District].push(row)
+  }
+
   return {
     policySummary,
     districtTiers,
@@ -140,6 +158,8 @@ export async function loadAllData() {
     floodByDistrict,
     droughtByDistrict,
     shapByDistrict,
-    cropRecByDistrict,   // NEW — passed to DistrictPanel and PolicyPage
+    cropRecByDistrict,
+    seasonalByDistrict,
+    monthlyByDistrict,
   }
 }

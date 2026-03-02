@@ -1,9 +1,9 @@
 Metric,CASA-Net
-Tier Accuracy (%),66.7
-Cohen's Kappa,0.474
-Macro F1 (Tier),0.675
+Tier Accuracy (%),71.7
+Cohen's Kappa,0.542
+Macro F1 (Tier),0.698
 Critical Misclass (T1↔T3),0.0
-Direction Accuracy (%),56.4
-Direction Kappa,-0.035
-Spearman Rank Corr,0.954
+Direction Accuracy (%),84.8
+Direction Kappa,0.476
+Spearman Rank Corr,0.971
 Top-5 District Overlap,4.0

@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 
 const TABS = [
-  { id: 'map',        label: 'Overview Map' },
+  { id: 'map',      label: 'Annual GW Map' },
+  { id: 'seasonal', label: 'Seasonal Map' },
+  { id: 'deepdive', label: 'District Deep Dive' },
   { id: 'priorities', label: 'Priority Districts' },
   { id: 'scenarios',  label: 'Scenarios' },
-  { id: 'policy',     label: 'Policy Analysis' },
-  { id: 'model',      label: 'Model & Explainability' },
+  { id: 'model',      label: 'Model Evaluation' },
 ]
 
 export default function Header({ activeTab, onTabChange }) {
@@ -36,7 +37,7 @@ export default function Header({ activeTab, onTabChange }) {
         ))}
       </nav>
 
-      {/* Mobile hamburger button */}
+      {/* Mobile hamburger */}
       <button
         className="hamburger-btn"
         onClick={() => setMenuOpen(o => !o)}
@@ -47,7 +48,7 @@ export default function Header({ activeTab, onTabChange }) {
         </span>
       </button>
 
-      {/* Mobile dropdown menu */}
+      {/* Mobile dropdown */}
       {menuOpen && (
         <div className="mobile-nav">
           {TABS.map(tab => (

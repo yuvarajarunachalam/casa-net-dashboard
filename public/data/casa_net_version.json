@@ -1,0 +1,14 @@
+{
+  "version": "v6",
+  "inputs": [
+    "crop_weights",
+    "lstm_hidden",
+    "arima_context",
+    "gw_lag1"
+  ],
+  "improvements": [
+    "huber_loss",
+    "lagged_gw_input",
+    "residual_arima"
+  ]
+}

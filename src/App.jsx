@@ -6,7 +6,8 @@ import DistrictPanel from './components/DistrictPanel'
 import PriorityTable from './components/PriorityTable'
 import ScenarioPlanner from './components/ScenarioPlanner'
 import ModelView from './components/ModelView'
-import PolicyPage from './components/PolicyPage'
+import SeasonalMap from './components/SeasonalMap'
+import DistrictDeepDive from './components/DistrictDeepDive'
 
 export default function App() {
   const [data,             setData]             = useState(null)
@@ -14,10 +15,8 @@ export default function App() {
   const [error,            setError]            = useState(null)
   const [activeTab,        setActiveTab]        = useState('map')
   const [selectedDistrict, setSelectedDistrict] = useState(null)
-  // Mobile: controls whether the district panel drawer is open
   const [panelOpen,        setPanelOpen]        = useState(false)
 
-  // Load all CSV and GeoJSON data once on mount
   useEffect(() => {
     loadAllData()
       .then(setData)
@@ -25,23 +24,15 @@ export default function App() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Clicking a district on the priority table navigates to the map tab
   const handleSelectDistrict = useCallback((district) => {
     setSelectedDistrict(district)
     setActiveTab('map')
     setPanelOpen(true)
   }, [])
 
-  // Clicking a district on the map opens the panel
   const handleMapSelect = useCallback((district) => {
     setSelectedDistrict(district)
     setPanelOpen(true)
-  }, [])
-
-  // Navigate directly to Policy Analysis for a given district
-  const handleOpenPolicy = useCallback((district) => {
-    setSelectedDistrict(district)
-    setActiveTab('policy')
   }, [])
 
   if (loading) {
@@ -49,9 +40,7 @@ export default function App() {
       <div className="loading-screen">
         <div className="spinner" />
         <h2>Loading dashboard data</h2>
-        <p style={{ fontSize: 13 }}>
-          Reading outputs from public/data/ &mdash; make sure you copied your outputs/ files there.
-        </p>
+        <p style={{ fontSize: 13 }}>Reading outputs from public/data/</p>
       </div>
     )
   }
@@ -61,13 +50,9 @@ export default function App() {
       <div className="error-screen">
         <h2>Data load failed</h2>
         <p style={{ marginBottom: 12, fontSize: 13 }}>
-          Could not load one or more required files from <code>public/data/</code>.
-          Check that you have copied all files from your <code>outputs/</code> folder.
+          Could not load required files from <code>public/data/</code>.
         </p>
         <pre>{error}</pre>
-        <p style={{ marginTop: 16, fontSize: 12, color: '#999' }}>
-          Required: policy_summary.csv, district_tiers.csv, enriched_districts.geojson
-        </p>
       </div>
     )
   }
@@ -81,7 +66,7 @@ export default function App() {
 
       <main className="main-layout">
 
-        {/* Map tab — map with district panel sidebar */}
+        {/* Tab 1: Annual GW Map */}
         {activeTab === 'map' && (
           <>
             <div className={`map-wrapper${panelOpen && selectedDistrict ? ' map-panel-open' : ''}`}>
@@ -92,28 +77,44 @@ export default function App() {
                 onSelectDistrict={handleMapSelect}
               />
             </div>
-
-            {/* Mobile panel overlay backdrop */}
             {panelOpen && selectedDistrict && (
-              <div
-                className="panel-backdrop"
-                onClick={() => setPanelOpen(false)}
-              />
+              <div className="panel-backdrop" onClick={() => setPanelOpen(false)} />
             )}
-
             <DistrictPanel
               district={selectedDistrict}
               districtData={districtData}
               cropRecData={cropRecData}
               gwHistory={data.gwHistory}
-              onOpenPolicy={handleOpenPolicy}
+              onOpenPolicy={(d) => { setSelectedDistrict(d); setActiveTab('deepdive') }}
               panelOpen={panelOpen}
               onClose={() => setPanelOpen(false)}
             />
           </>
         )}
 
-        {/* Priority Districts tab */}
+        {/* Tab 2: Seasonal Crop Map */}
+        {activeTab === 'seasonal' && (
+          <SeasonalMap
+            geojson={data.geojson}
+            seasonalByDistrict={data.seasonalByDistrict}
+            monthlyByDistrict={data.monthlyByDistrict}
+          />
+        )}
+
+        {/* Tab 3: District Deep Dive */}
+        {activeTab === 'deepdive' && (
+          <div className="page-container" style={{ overflowY: 'auto', flex: 1 }}>
+            <DistrictDeepDive
+              byDistrict={data.byDistrict}
+              gwHistory={data.gwHistory}
+              monthlyByDistrict={data.monthlyByDistrict}
+              seasonalByDistrict={data.seasonalByDistrict}
+              cropRecByDistrict={data.cropRecByDistrict}
+            />
+          </div>
+        )}
+
+        {/* Tab 4: Priority Districts */}
         {activeTab === 'priorities' && (
           <PriorityTable
             districtTiers={data.policySummary}
@@ -121,7 +122,7 @@ export default function App() {
           />
         )}
 
-        {/* Scenario Planning tab */}
+        {/* Tab 5: Scenarios */}
         {activeTab === 'scenarios' && (
           <ScenarioPlanner
             floodByDistrict={data.floodByDistrict}
@@ -130,19 +131,9 @@ export default function App() {
           />
         )}
 
-        {/* Model and Explainability tab */}
+        {/* Tab 6: Model Evaluation */}
         {activeTab === 'model' && (
           <ModelView modelMetrics={data.modelMetrics} />
-        )}
-
-        {/* Policy Analysis tab */}
-        {activeTab === 'policy' && (
-          <PolicyPage
-            geojson={data.geojson}
-            byDistrict={data.byDistrict}
-            policySummary={data.policySummary}
-            cropRecByDistrict={data.cropRecByDistrict}
-          />
         )}
 
       </main>
