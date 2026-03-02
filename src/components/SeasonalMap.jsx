@@ -44,70 +44,68 @@ function SeasonalLegend() {
   )
 }
 
-// 12-month stress curve chart
+// 12-month stress curve chart — shows specific year, defaults to most recent forecast
 function StressCurveChart({ monthlyData, district, peakMonth, recoveryMonth }) {
   if (!monthlyData?.length) return null
 
-  // Average Pred_1m by month across all years
-  const byMonth = {}
-  for (const row of monthlyData) {
-    const m = row.Month
-    if (!byMonth[m]) byMonth[m] = []
-    if (row.Pred_1m != null) byMonth[m].push(row.Pred_1m)
-    else if (row.GW_Actual != null) byMonth[m].push(row.GW_Actual)
-  }
+  const PREDICT_FROM = 2022
+  const allYears      = [...new Set(monthlyData.map(r => +r.Year))].sort()
+  const forecastYears = allYears.filter(y => y >= PREDICT_FROM)
+  const defaultYear   = forecastYears.length
+    ? forecastYears[forecastYears.length - 1]
+    : allYears[allYears.length - 1]
+
+  const [selectedYear, setSelectedYear] = useState(defaultYear)
+
+  const yearRows = monthlyData.filter(r => +r.Year === selectedYear)
 
   const chartData = MONTHS.map((name, i) => {
-    const m    = i + 1
-    const vals = byMonth[m] || []
-    const avg  = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null
-    return { month: name, depth: avg ? +avg.toFixed(2) : null }
+    const m   = i + 1
+    const row = yearRows.find(r => +r.Month === m)
+    const val = row?.Pred_1m ?? row?.GW_Actual ?? null
+    return { month: name, depth: val != null ? +Number(val).toFixed(2) : null }
   }).filter(d => d.depth != null)
 
-  const peakIdx     = MONTHS.indexOf(peakMonth)
-  const recoveryIdx = MONTHS.indexOf(recoveryMonth)
-
   return (
-    <ResponsiveContainer width="100%" height={180}>
-      <LineChart data={chartData} margin={{ top: 8, right: 16, left: -10, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e8ecf0" />
-        <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-        <YAxis
-          reversed
-          tick={{ fontSize: 10 }}
-          label={{ value: 'Depth (m)', angle: -90, position: 'insideLeft', fontSize: 10 }}
-        />
-        <Tooltip
-          formatter={(v) => [`${v}m`, 'Avg GW Depth']}
-          labelStyle={{ fontWeight: 700, fontSize: 12 }}
-          contentStyle={{ fontSize: 11 }}
-        />
-        {peakIdx >= 0 && (
-          <ReferenceLine
-            x={MONTHS[peakIdx]}
-            stroke="#c0392b"
-            strokeDasharray="4 2"
-            label={{ value: 'Peak', position: 'top', fontSize: 10, fill: '#c0392b' }}
+    <div>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 8, flexWrap: 'wrap' }}>
+        {allYears.slice(-6).map(y => (
+          <button key={y} onClick={() => setSelectedYear(y)} style={{
+            padding: '3px 8px', borderRadius: 4, border: '1px solid #dde3ea',
+            fontSize: 10, fontWeight: 600, cursor: 'pointer',
+            background: selectedYear === y ? '#1c2e4a' : 'white',
+            color: selectedYear === y ? 'white' : '#7f8c8d',
+          }}>{y}{y >= PREDICT_FROM ? ' ★' : ''}</button>
+        ))}
+        <span style={{ fontSize: 10, color: '#aaa', alignSelf: 'center' }}>★ = forecast</span>
+      </div>
+      <ResponsiveContainer width="100%" height={180}>
+        <LineChart data={chartData} margin={{ top: 8, right: 16, left: -10, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e8ecf0" />
+          <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+          <YAxis
+            reversed
+            tick={{ fontSize: 10 }}
+            label={{ value: 'Depth (m)', angle: -90, position: 'insideLeft', fontSize: 10 }}
           />
-        )}
-        {recoveryIdx >= 0 && (
-          <ReferenceLine
-            x={MONTHS[recoveryIdx]}
-            stroke="#27ae60"
-            strokeDasharray="4 2"
-            label={{ value: 'Recovery', position: 'top', fontSize: 10, fill: '#27ae60' }}
+          <Tooltip
+            formatter={(v) => [`${v}m`, 'GW Depth']}
+            labelStyle={{ fontWeight: 700, fontSize: 12 }}
+            contentStyle={{ fontSize: 11 }}
           />
-        )}
-        <Line
-          type="monotone"
-          dataKey="depth"
-          stroke="#2980b9"
-          strokeWidth={2}
-          dot={{ r: 3, fill: '#2980b9' }}
-          activeDot={{ r: 5 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+          {peakMonth && (
+            <ReferenceLine x={peakMonth} stroke="#c0392b" strokeDasharray="4 2"
+              label={{ value: 'Peak', position: 'top', fontSize: 10, fill: '#c0392b' }} />
+          )}
+          {recoveryMonth && (
+            <ReferenceLine x={recoveryMonth} stroke="#27ae60" strokeDasharray="4 2"
+              label={{ value: 'Recovery', position: 'top', fontSize: 10, fill: '#27ae60' }} />
+          )}
+          <Line type="monotone" dataKey="depth" stroke="#2980b9" strokeWidth={2}
+            dot={{ r: 3, fill: '#2980b9' }} activeDot={{ r: 5 }} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   )
 }
 

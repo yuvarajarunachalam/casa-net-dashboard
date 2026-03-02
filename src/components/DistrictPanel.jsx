@@ -5,8 +5,10 @@ import { useNarrative } from '../hooks/useNarrative'
 import GWChart from './GWChart'
 
 function TrendArrow({ value }) {
-  if (value > 0.05)  return <span className="trend-up">&uarr; {value.toFixed(2)}m/yr</span>
-  if (value < -0.05) return <span className="trend-down">&darr; {Math.abs(value).toFixed(2)}m/yr</span>
+  // Positive trend = depth value increasing = water table FALLING = depleting = bad (red)
+  // Negative trend = depth value decreasing = water table RISING = recovering = good (green)
+  if (value > 0.05)  return <span className="trend-up">↓ table {value.toFixed(2)}m/yr</span>
+  if (value < -0.05) return <span className="trend-down">↑ table {Math.abs(value).toFixed(2)}m/yr</span>
   return <span className="trend-flat">stable</span>
 }
 

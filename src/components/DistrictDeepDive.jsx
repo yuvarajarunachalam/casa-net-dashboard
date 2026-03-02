@@ -84,46 +84,119 @@ function GWHistoryChart({ gwHistory, district }) {
   )
 }
 
-// Monthly depth chart from 4b model
+// Monthly depth chart — year-selectable, predicted years only
 function MonthlyDepthChart({ monthlyData }) {
   if (!monthlyData?.length) return null
 
-  const byMonth = {}
-  for (const row of monthlyData) {
-    const m = row.Month
-    if (!byMonth[m]) byMonth[m] = []
-    const val = row.Pred_1m ?? row.GW_Actual
-    if (val != null) byMonth[m].push(+val)
-  }
+  // Separate historical (has GW_Actual) from predicted (has Pred_1m, no Actual)
+  // Predicted years = 2022 onwards (the forecast window from 4b model)
+  const PREDICT_FROM_YEAR = 2022
+
+  // Get all available years in the data
+  const allYears = [...new Set(monthlyData.map(r => +r.Year))].sort()
+  const predictedYears = allYears.filter(y => y >= PREDICT_FROM_YEAR)
+  const historicalYears = allYears.filter(y => y < PREDICT_FROM_YEAR)
+
+  // Default: most recent predicted year, fallback to most recent historical
+  const defaultYear = predictedYears.length
+    ? predictedYears[predictedYears.length - 1]
+    : historicalYears[historicalYears.length - 1]
+
+  const [selectedYear, setSelectedYear] = useState(defaultYear)
+  const [showType, setShowType] = useState('predicted') // 'predicted' | 'historical'
+
+  const yearsToShow = showType === 'predicted' ? predictedYears : historicalYears
+  const activeYear  = yearsToShow.includes(selectedYear) ? selectedYear : yearsToShow[yearsToShow.length - 1]
+
+  // Get data for selected year
+  const yearRows = monthlyData.filter(r => +r.Year === activeYear)
 
   const chartData = MONTHS.map((name, i) => {
-    const m    = i + 1
-    const vals = byMonth[m] || []
-    const avg  = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null
-    return { month: name, depth: avg ? +avg.toFixed(2) : null, monsoon: MONSOON_MONTHS.includes(m) }
+    const m   = i + 1
+    const row = yearRows.find(r => +r.Month === m)
+    const val = showType === 'predicted'
+      ? (row?.Pred_1m ?? null)
+      : (row?.GW_Actual ?? row?.Pred_1m ?? null)
+    return {
+      month  : name,
+      depth  : val != null ? +Number(val).toFixed(2) : null,
+      monsoon: MONSOON_MONTHS.includes(m),
+    }
   })
 
   return (
-    <ResponsiveContainer width="100%" height={180}>
-      <BarChart data={chartData} margin={{ top: 8, right: 16, left: -10, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e8ecf0" />
-        <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-        <YAxis
-          reversed tick={{ fontSize: 10 }}
-          label={{ value: 'Depth (m)', angle: -90, position: 'insideLeft', fontSize: 10 }}
-        />
-        <Tooltip formatter={(v) => [`${v}m`, 'Avg Depth']} contentStyle={{ fontSize: 11 }} />
-        <Bar dataKey="depth" radius={[3, 3, 0, 0]}>
-          {chartData.map((entry, i) => (
-            <Cell
-              key={i}
-              fill={entry.monsoon ? '#3498db' : entry.depth > 8 ? '#c0392b' : entry.depth > 5 ? '#e67e22' : '#27ae60'}
-              opacity={0.8}
-            />
+    <div>
+      {/* Year type toggle + year selector */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {['predicted', 'historical'].map(t => (
+            <button
+              key={t}
+              onClick={() => setShowType(t)}
+              style={{
+                padding: '4px 10px', borderRadius: 5, border: '1px solid #dde3ea',
+                fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                background: showType === t ? '#2980b9' : 'white',
+                color: showType === t ? 'white' : '#7f8c8d',
+              }}
+            >
+              {t === 'predicted' ? 'Forecast' : 'Historical'}
+            </button>
           ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+        </div>
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          {yearsToShow.map(y => (
+            <button
+              key={y}
+              onClick={() => setSelectedYear(y)}
+              style={{
+                padding: '4px 8px', borderRadius: 5, border: '1px solid #dde3ea',
+                fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                background: activeYear === y ? '#1c2e4a' : 'white',
+                color: activeYear === y ? 'white' : '#7f8c8d',
+              }}
+            >
+              {y}
+            </button>
+          ))}
+        </div>
+        {showType === 'predicted' && (
+          <span style={{ fontSize: 10, color: '#aaa', fontStyle: 'italic' }}>
+            CASA-Net 4b 1-month ahead predictions
+          </span>
+        )}
+      </div>
+
+      <ResponsiveContainer width="100%" height={180}>
+        <BarChart data={chartData} margin={{ top: 8, right: 16, left: -10, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e8ecf0" />
+          <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+          <YAxis
+            reversed tick={{ fontSize: 10 }}
+            label={{ value: 'Depth (m)', angle: -90, position: 'insideLeft', fontSize: 10 }}
+          />
+          <Tooltip
+            formatter={(v) => [`${v}m`, showType === 'predicted' ? 'Predicted Depth' : 'Actual Depth']}
+            contentStyle={{ fontSize: 11 }}
+          />
+          <Bar dataKey="depth" radius={[3, 3, 0, 0]}>
+            {chartData.map((entry, i) => (
+              <Cell
+                key={i}
+                fill={
+                  entry.depth == null ? '#e8ecf0'
+                  : entry.monsoon ? '#3498db'
+                  : entry.depth > 8 ? '#c0392b'
+                  : entry.depth > 5 ? '#e67e22'
+                  : '#27ae60'
+                }
+                opacity={entry.depth == null ? 0.3 : 0.85}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   )
 }
 
@@ -265,10 +338,25 @@ export default function DistrictDeepDive({
           color="#e67e22" />
         <StatCard label="Depth 5yr" value={districtData.CASA_Pred_5yr?.toFixed(2)} unit="m"
           color={trend > 0 ? '#c0392b' : '#27ae60'} />
-        <StatCard label="GW Trend"
-          value={trend > 0 ? `+${trend.toFixed(3)}` : trend.toFixed(3)} unit="m/yr"
-          color={trend > 0.1 ? '#c0392b' : trend < -0.05 ? '#27ae60' : '#e67e22'}
-          note={trend > 0.05 ? 'Depleting' : trend < -0.05 ? 'Recovering' : 'Stable'} />
+        {/* GW Trend — explained clearly:
+            Positive trend = depth VALUE increasing = water table going DOWN = depleting
+            Negative trend = depth VALUE decreasing = water table coming UP = recovering
+            Most TN districts show negative trend due to 2019-22 good monsoons,
+            but absolute depth is still high for critical districts */}
+        <StatCard label="Water Table Trend"
+          value={
+            Math.abs(trend) < 0.05 ? 'Stable'
+            : trend > 0 ? `↓ ${trend.toFixed(2)}m/yr`    // positive = water table falling = bad
+            : `↑ ${Math.abs(trend).toFixed(2)}m/yr`       // negative = water table rising = good
+          }
+          unit=""
+          color={trend > 0.05 ? '#c0392b' : trend < -0.05 ? '#27ae60' : '#e67e22'}
+          note={
+            trend > 0.05 ? 'Table falling (depleting)'
+            : trend < -0.05 ? 'Table rising (recovering)'
+            : 'Stable'
+          }
+        />
         <StatCard label="GW Dependency" value={Math.round((districtData.GW_Dep_Ratio || 0) * 100)}
           unit="%" color="#2980b9" note="of irrigation" />
         {calRow && (
