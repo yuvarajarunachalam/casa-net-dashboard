@@ -57,10 +57,43 @@ export async function loadAllData() {
     fetchCSV(DATA_FILES.monthly_predictions).catch(() => []),
   ])
 
-  // Build a fast lookup dictionary by district name
+  // Build a fast lookup dictionary by district name from policy_summary
   const byDistrict = {}
   for (const row of policySummary) {
-    if (row.District) byDistrict[row.District] = row
+    if (row.District) byDistrict[row.District] = { ...row }
+  }
+
+  // Enrich byDistrict with Rev_ columns and crop weights from latest casa prediction row
+  // Rev_Rice, Rev_Groundnut etc. live in casa_net_predictions.csv, not policy_summary
+  const CROPS = ['Rice', 'Groundnut', 'Jowar', 'Bajra', 'Maize']
+  for (const row of casaPredictions) {
+    if (!row.District || !byDistrict[row.District]) continue
+    const d = byDistrict[row.District]
+    // Copy Rev_ and weight columns if not already present
+    for (const c of CROPS) {
+      if (row[`Rev_${c}`]      != null) d[`Rev_${c}`]      = row[`Rev_${c}`]
+      if (row[`${c}_weight`]   != null) d[`${c}_weight`]   = row[`${c}_weight`]
+    }
+  }
+  // Also pull crop weights from mergedAnnual (most recent year per district)
+  const latestMerged = {}
+  for (const row of mergedAnnual) {
+    if (!row.District) continue
+    if (!latestMerged[row.District] || row.Year > latestMerged[row.District].Year) {
+      latestMerged[row.District] = row
+    }
+  }
+  for (const [district, row] of Object.entries(latestMerged)) {
+    if (!byDistrict[district]) continue
+    const d = byDistrict[district]
+    for (const c of CROPS) {
+      if (d[`${c}_weight`] == null && row[`${c}_weight`] != null) {
+        d[`${c}_weight`] = row[`${c}_weight`]
+      }
+      if (d[`Rev_${c}`] == null && row[`Rev_${c}`] != null) {
+        d[`Rev_${c}`] = row[`Rev_${c}`]
+      }
+    }
   }
 
   // Build crop recommendation lookup — 1yr horizon, Samba season per district.

@@ -231,50 +231,81 @@ function CropAreaChart({ districtData }) {
 // MSP × Yield revenue table
 function MSPRevenueSection({ districtData, cropRecData }) {
   const MSP = { Rice: 2183, Groundnut: 6377, Jowar: 3180, Bajra: 2500, Maize: 2090 }
-  const rows = CROPS.map(c => ({
+
+  // Collect raw revenue values — prefer Rev_ column, fall back to MSP × weight proxy
+  const rawRevs = CROPS.map(c => {
+    const fromCol = districtData?.[`Rev_${c}`]
+    if (fromCol != null && fromCol > 0) return fromCol
+    const weight = districtData?.[`${c}_weight`] ?? 0
+    return MSP[c] * weight
+  })
+
+  const maxRev = Math.max(...rawRevs, 1)
+  const minRev = Math.min(...rawRevs.filter(v => v > 0), 0)
+  const range  = maxRev - minRev || 1
+
+  const rows = CROPS.map((c, i) => ({
     crop    : c,
-    share   : districtData?.[`${c}_weight`] ? +(districtData[`${c}_weight`] * 100).toFixed(1) : 0,
+    share   : districtData?.[`${c}_weight`] != null ? +(districtData[`${c}_weight`] * 100).toFixed(1) : 0,
     msp     : MSP[c],
-    revenue : districtData?.[`Rev_${c}`] != null
-              ? +(districtData[`Rev_${c}`]).toFixed(2)
-              : null,
+    revScore: +((rawRevs[i] - minRev) / range).toFixed(2),
   })).filter(d => d.share > 0.5).sort((a, b) => b.share - a.share)
 
-  if (!rows.length) return null
+  if (!rows.length) return (
+    <div style={{ fontSize: 12, color: '#aaa', padding: 8 }}>Crop area data not available.</div>
+  )
 
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-        <thead>
-          <tr style={{ background: '#f8f9fa' }}>
-            {['Crop','Area Share','MSP (₹/qtl)','Rev Score'].map(h => (
-              <th key={h} style={{ padding: '7px 10px', textAlign: 'left',
-                                   borderBottom: '2px solid #e8ecf0', fontWeight: 600,
-                                   fontSize: 11, color: '#7f8c8d' }}>{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r, i) => (
-            <tr key={r.crop} style={{ background: i % 2 ? '#fafbfc' : 'white' }}>
-              <td style={{ padding: '6px 10px' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: 2,
-                                 background: CROP_COLORS[r.crop], display: 'inline-block' }} />
-                  {r.crop}
-                </span>
-              </td>
-              <td style={{ padding: '6px 10px', fontWeight: 600 }}>{r.share}%</td>
-              <td style={{ padding: '6px 10px' }}>₹{r.msp.toLocaleString('en-IN')}</td>
-              <td style={{ padding: '6px 10px', color: r.revenue > 0.6 ? '#27ae60' : '#e67e22', fontWeight: 600 }}>
-                {r.revenue != null ? r.revenue.toFixed(2) : '—'}
-              </td>
+    <div>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+          <thead>
+            <tr style={{ background: '#f8f9fa' }}>
+              {['Crop','Area Share','MSP (₹/qtl)','Rev Score'].map(h => (
+                <th key={h} style={{ padding: '7px 10px', textAlign: 'left',
+                                     borderBottom: '2px solid #e8ecf0', fontWeight: 600,
+                                     fontSize: 11, color: '#7f8c8d' }}>{h}</th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <div style={{ fontSize: 10, color: '#aaa', marginTop: 6 }}>
-        Revenue score = normalised MSP × Yield index (0–1). Higher = stronger economic incentive to grow this crop.
+          </thead>
+          <tbody>
+            {rows.map((r, i) => (
+              <tr key={r.crop} style={{ background: i % 2 ? '#fafbfc' : 'white' }}>
+                <td style={{ padding: '6px 10px' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: 2,
+                                   background: CROP_COLORS[r.crop], display: 'inline-block' }} />
+                    {r.crop}
+                  </span>
+                </td>
+                <td style={{ padding: '6px 10px', fontWeight: 600 }}>{r.share}%</td>
+                <td style={{ padding: '6px 10px' }}>₹{r.msp.toLocaleString('en-IN')}</td>
+                <td style={{ padding: '6px 10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 50, height: 6, borderRadius: 3, background: '#e8ecf0', overflow: 'hidden' }}>
+                      <div style={{
+                        width: `${r.revScore * 100}%`, height: '100%', borderRadius: 3,
+                        background: r.revScore > 0.6 ? '#27ae60' : r.revScore > 0.3 ? '#e67e22' : '#c0392b'
+                      }} />
+                    </div>
+                    <span style={{ fontWeight: 700,
+                      color: r.revScore > 0.6 ? '#27ae60' : r.revScore > 0.3 ? '#e67e22' : '#c0392b' }}>
+                      {r.revScore.toFixed(2)}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div style={{ marginTop: 10, padding: '8px 12px', background: '#f0f7ff',
+                    borderRadius: 6, fontSize: 11, color: '#2c3e50', lineHeight: 1.65 }}>
+        <strong>How to read this:</strong> Revenue Score = normalised (MSP × crop yield) index (0–1).
+        <strong> High score (green)</strong> = strong farmer income from this crop — harder to convince
+        farmers to switch away. <strong>Low score (red)</strong> = poor returns at current MSP —
+        crop diversification is more feasible as a policy. A depleting district with high Rice score
+        needs an income-replacement scheme before any crop switch can succeed.
       </div>
     </div>
   )
@@ -365,6 +396,24 @@ export default function DistrictDeepDive({
             color="#9b59b6"
             note={`${calRow.Seasonal_Range_m}m seasonal range`} />
         )}
+      </div>
+
+      {/* Explanation panel for the stat cards — addresses "what do these numbers mean" */}
+      <div style={{
+        background: '#f8f9fa', borderRadius: 8, padding: '12px 16px',
+        marginBottom: 20, fontSize: 12, lineHeight: 1.7, color: '#555',
+        borderLeft: '3px solid #2980b9',
+      }}>
+        <strong style={{ color: '#2c3e50' }}>How to read these numbers:</strong>
+        {' '}Depth values (1yr/3yr/5yr) show how far below the surface the water table will be —
+        deeper = more critical. Most Tamil Nadu districts have depths of 3–13m, with anything above 7m
+        requiring intervention.
+        {' '}<strong>Water Table Trend</strong> shows the 7-year directional change:
+        ↑ rising (good, recent monsoons recharged) vs ↓ falling (bad, over-extraction).
+        {' '}Note: a district can have a rising trend but still be critical — Coimbatore is improving
+        but still at 11m, which is unsustainable.
+        {' '}<strong>GW Dependency</strong> = what fraction of irrigation comes from groundwater.
+        100% dependency means zero surface water backup — any GW shock directly hits crop yields.
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
