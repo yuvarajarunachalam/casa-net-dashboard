@@ -13,7 +13,7 @@ export const DATA_FILES = {
   drought_contingency : `${DATA_BASE}/drought_contingency.csv`,
   model_metrics       : `${DATA_BASE}/model_comparison_metrics.csv`,
   merged_annual       : `${DATA_BASE}/merged_annual.csv`,
-  casa_predictions    : `${DATA_BASE}/casa_net_predictions.csv`,
+  casa_predictions    : `${DATA_BASE}/casa_net_v9_predictions.csv`,
   crop_recommendations: `${DATA_BASE}/crop_recommendations.csv`,
   geojson             : `${DATA_BASE}/enriched_districts.geojson`,
   seasonal_calendar   : `${DATA_BASE}/seasonal_stress_calendar.csv`,
